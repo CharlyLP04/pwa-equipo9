@@ -28,3 +28,21 @@
 * **Limitación o riesgo que encontré:** La operación offline todavía no está implementada durante esta etapa del proyecto, por lo que únicamente se documentó como requisito futuro. También se observó que `npm ci` reportó dos vulnerabilidades de severidad alta en las dependencias instaladas; no se modificaron automáticamente las dependencias para evitar alterar el starter proporcionado antes de analizar su impacto.
 
 * **Uso de IA:** Utilicé ChatGPT como apoyo para revisar la redacción de los requisitos no funcionales, convertirlos en criterios verificables y revisar la estructura de mi evidencia individual. Las secciones influenciadas fueron los RNF, datos sintéticos, criterios de aceptación y esta evidencia. Verifiqué manualmente que el contenido correspondiera con las instrucciones de la actividad y ejecuté personalmente `npm ci`, `npm run dev` y `npm run verify` para comprobar los resultados descritos.
+
+===========
+
+## 3523110113 Montalvo Osorio Alexis
+
+- **Contribución:** Redacción de la primera mitad de `docs/requirements.md`, incluyendo el problema, contexto, límites, usuarios, escenarios y requisitos funcionales relacionados con la conectividad estable e intermitente.
+
+- **Repositorio y evidencia:** La contribución se encuentra en la rama `docs/requirements-escenarios-alexis` y en el Pull Request correspondiente del repositorio `pwa-equipo9`.
+
+- **Decisión técnica:** Se definió explícitamente un escenario de conectividad intermitente como parte importante del producto, debido a que las inspecciones pueden realizarse en zonas donde la conexión de red no sea estable. La operación futura no debe depender de una conexión perfecta.
+
+- **Comando o prueba ejecutada y resultado:** Se ejecutó `npm run dev`. El servidor de Next.js inició correctamente y la aplicación estuvo disponible en `http://localhost:3000`, mostrando la pantalla inicial de inspecciones con datos sintéticos.
+
+- **Qué demuestra y qué no demuestra:** La prueba demuestra que el proyecto puede instalarse y ejecutarse localmente y que la pantalla inicial del starter carga correctamente. No demuestra todavía el funcionamiento del modo offline, la sincronización automática ni la compilación de producción.
+
+- **Limitación o riesgo:** Durante la Semana 1 no se implementan las funcionalidades offline ni la sincronización automática. Estas funcionalidades deberán validarse en las etapas posteriores del proyecto.
+
+- **Uso de IA:** Se utilizó ChatGPT como asistente para apoyar la redacción y estructuración del contenido en Markdown de `docs/requirements.md` y `evidence/individual.md`. El contenido fue revisado y validado manualmente antes de incorporarlo al proyecto.
