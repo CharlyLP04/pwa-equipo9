@@ -2,7 +2,7 @@
 
 ## 3523110057 Pacheco Avila Carlos Alberto
 
-* **Repositorio y commit evaluado:** Repositorio del equipo `CharlyLP04/pwa-equipo9`. Commit/PR de mi contribución: pendiente de registrar después del push.
+* **Repositorio y commit evaluado:** Repositorio del equipo `CharlyLP04/pwa-equipo9`. Mi contribución inicial corresponde al commit `e624c95`.
 
 * **Mi contribución concreta:** Redacción y definición de la segunda parte de `docs/requirements.md`, específicamente los requisitos no funcionales de reproducibilidad, accesibilidad, seguridad, privacidad, rendimiento y operación offline futura. También definí los datos sintéticos permitidos, los datos reales excluidos y los criterios de aceptación correspondientes a la Semana 1.
 
