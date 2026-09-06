@@ -4,30 +4,64 @@
 
 ## 1. Problema y contexto
 
-Se requiere una aplicación web progresiva (PWA) para el registro, consulta y seguimiento de inspecciones de mantenimiento preventivo y correctivo en laboratorios de cómputo y talleres técnicos. 
+El proyecto consiste en una aplicación web progresiva (PWA) para registrar, consultar y dar seguimiento a inspecciones de mantenimiento preventivo y correctivo en laboratorios de cómputo y talleres técnicos.
 
-*   **Contexto de conectividad:** Las inspecciones físicas suelen realizarse en áreas de laboratorios y sótanos donde la cobertura de red (WiFi o datos móviles) puede ser intermitente, inestable o inexistente durante los recorridos. La solución debe permitir consultar la información esencial y prepararse para la captura desconectada.
-*   **Fuera del alcance (Semana 1):** Sincronización en tiempo real con bases de datos remotas multiusuario, autenticación federada institucional, generación de órdenes de compra/adquisición de repuestos y gestión de nóminas o personal.
+El problema principal es que el personal de mantenimiento puede tener dificultades para registrar las inspecciones cuando la conexión a Internet es inestable o se pierde durante los recorridos.
+
+El sistema estará pensado para utilizarse desde dispositivos móviles durante las rondas de inspección, permitiendo registrar información sobre el estado de los laboratorios y los hallazgos encontrados.
+
+### Límites del proyecto
+
+Durante la Semana 1, el proyecto se limita al funcionamiento del starter y a la definición de requisitos. No se implementarán todavía las funcionalidades PWA de trabajo offline, sincronización automática, notificaciones ni autenticación.
+
+Quedan fuera del alcance:
+
+- Chat o comunicación entre usuarios.
+- Gestión de inventario de hardware.
+- Generación de órdenes de compra o adquisición de repuestos.
+- Asignación automática de turnos o personal.
+- Gestión de nóminas.
+- Autenticación institucional.
 
 ## 2. Usuarios y escenarios
 
-*   **Técnico / Inspector de Mantenimiento:** Responsable de realizar rondas de inspección física en las instalaciones, verificar el estado de los equipos y registrar hallazgos técnicos.
-*   **Coordinador de Laboratorios y Soporte:** Responsable de supervisar el estado general de los laboratorios, priorizar incidencias y planificar mantenimientos.
+### Usuarios
+
+- **Técnico / Inspector de Mantenimiento:** Realiza las rondas de inspección, verifica las condiciones de los laboratorios y registra los hallazgos encontrados.
+- **Coordinador de Laboratorios y Soporte:** Consulta las inspecciones realizadas y utiliza la información para identificar incidencias y planificar acciones de mantenimiento.
 
 ### Escenarios observables
-*   **Escenario 1 (Ronda en zona de conectividad intermitente):** El técnico realiza una inspección en el *Laboratorio de Redes*. Al entrar al área y perder señal de red, puede abrir la aplicación, visualizar el catálogo local precargado de inspecciones y revisar el histórico de observaciones sin interrupciones ni bloqueos de pantalla.
-*   **Escenario 2 (Monitoreo de estado y hallazgos):** El coordinador accede a la aplicación desde su estación de trabajo para consultar el tablero de inspecciones, identificando de inmediato aquellas marcadas con estado *Requiere atención* y el número de hallazgos detectados para programar la intervención.
+
+#### Escenario 1 — Inspección con conexión estable
+
+El técnico realiza una inspección en un laboratorio donde existe una conexión Wi-Fi estable. Durante el recorrido identifica un hallazgo, por ejemplo, un cable expuesto, registra los datos de la inspección y guarda el registro.
+
+**Resultado esperado:** La información se guarda correctamente y el registro aparece inmediatamente en el historial de inspecciones.
+
+#### Escenario 2 — Inspección con conectividad intermitente
+
+El técnico realiza una inspección en un laboratorio o zona donde la señal Wi-Fi o de datos móviles es intermitente o inexistente. El técnico llena el formulario de inspección y solicita guardar la información aunque no exista conexión en ese momento.
+
+**Resultado esperado:** En la versión futura del sistema, la información debe poder guardarse localmente sin bloquear la aplicación y quedar pendiente para sincronizarse automáticamente cuando se recupere la conexión.
 
 ## 3. Requisitos funcionales
 
-*   **RF-01 (Visualización de catálogo de inspecciones):** El sistema debe mostrar el listado de inspecciones con ID, ubicación simulada, fecha, inspector asignado, estado y resumen.
-    *   *Condición de aceptación:* Renderizar en la vista principal las tarjetas/filas correspondientes a todas las inspecciones registradas en el catálogo local.
-*   **RF-02 (Indicadores visuales de estado):** Cada inspección debe contar con un distintivo visual claro de su estado (`Sin incidencias` / `Requiere atención`).
-    *   *Condición de aceptación:* El componente visual debe diferenciar cromática y textualmente el estado para facilitar su lectura rápida.
-*   **RF-03 (Resumen y métricas de hallazgos):** La interfaz debe presentar el conteo numérico de hallazgos y una breve descripción sintética de las observaciones encontradas.
-    *   *Condición de aceptación:* Se debe reflejar con precisión el número de observaciones asociadas a cada registro.
-*   **RF-04 (Carga de datos desacoplada y tipada):** El modelo de datos debe estar fuertemente tipado en TypeScript y proveer registros sintéticos locales.
-    *   *Condición de aceptación:* La aplicación compila sin errores de tipos y consume los datos locales definidos en `src/lib/data/inspections.ts`.
+### RF-01 — Registro de una nueva inspección
+
+El sistema debe permitir al técnico registrar una nueva inspección indicando como mínimo el laboratorio, la fecha y el hallazgo encontrado.
+
+**Escenario relacionado:** Escenario 1 — Inspección con conexión estable.
+
+**Condición de aceptación:** Cuando se introduzcan datos válidos y exista conexión disponible, la inspección debe guardarse correctamente y aparecer en el historial de inspecciones.
+
+### RF-02 — Captura de inspección con conectividad intermitente
+
+El sistema deberá permitir capturar una inspección cuando no exista conexión disponible, conservando temporalmente la información para su posterior sincronización.
+
+**Escenario relacionado:** Escenario 2 — Inspección con conectividad intermitente.
+
+**Condición de aceptación:** Al intentar guardar una inspección sin conexión, la aplicación deberá mostrar un indicador de que la información fue guardada localmente y conservar los datos para que puedan sincronizarse cuando vuelva la conexión.
+
 
 ## 4. Requisitos no funcionales
 
