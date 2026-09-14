@@ -37,5 +37,46 @@
   "categories": [
     "productivity",
     "utilities"
+  ],
+  "shortcuts": [
+    {
+      "name": "Nueva inspección",
+      "short_name": "Nueva",
+      "description": "Registrar una nueva inspección de mantenimiento en laboratorio",
+      "url": "/?accion=nueva-inspeccion",
+      "icons": [
+        {
+          "src": "/icons/icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Inspecciones recientes",
+      "short_name": "Inicio",
+      "description": "Consultar el listado de inspecciones recientes",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/icons/icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Historial",
+      "short_name": "Historial",
+      "description": "Abrir el historial de inspecciones registradas",
+      "url": "/?nav=historial",
+      "icons": [
+        {
+          "src": "/icons/icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
   ]
 }
