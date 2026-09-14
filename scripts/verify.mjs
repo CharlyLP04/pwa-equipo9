@@ -12,6 +12,11 @@ const required = [
   "docs/requirements.md",
   "docs/decision-record.md",
   "tests/starter.spec.mjs",
+  "public/manifest.webmanifest",
+  "src/components/app-shell.tsx",
+  "tests/manifest.spec.ts",
+  "public/icons/icon-192x192.png",
+  "public/icons/icon-512x512.png",
   "evidence/individual.md"
 ];
 
