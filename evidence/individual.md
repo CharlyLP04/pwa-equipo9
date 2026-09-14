@@ -19,6 +19,31 @@ Actualmente los estados dependen de un booleano local y datos sintéticos en mem
 - **Propósito:** Estructuración de la arquitectura de componentes para el App Shell y división modular del equipo.
 - **Validación:** Se revisó manualmente la sintaxis de TypeScript, compatibilidad con Next.js App Router y se verificó en compilación local.
 
+Integrante: Carlos Alberto Pacheco Avila
+
+Aporte:
+Implementación de pruebas automatizadas para validar shortcuts del Web App Manifest y accesibilidad del App Shell.
+
+Commit SHA:
+f6cfd4f668c6eaebef17c967e2c48b2b6f4f0ac9
+
+Decisión técnica:
+Se utilizó tsx para ejecutar tests escritos en TypeScript manteniendo el archivo tests/manifest.spec.ts requerido por la actividad.
+
+Prueba ejecutada:
+npm test
+
+Resultado:
+PASS. Todos los tests de manifest, shortcuts, accesibilidad, metadatos PWA y estados del App Shell fueron ejecutados correctamente.
+
+Limitación:
+Las pruebas implementadas validan principalmente estructura, configuración y código fuente; no sustituyen una auditoría completa de accesibilidad o instalación en dispositivos reales.
+
+Uso de IA:
+Herramienta: ChatGPT
+Propósito: apoyo para análisis de errores, configuración del entorno y diseño de pruebas.
+Validación humana: los cambios fueron revisados y las pruebas fueron ejecutadas localmente antes de integrarse.
+
 ---
 
 # Histórico: Evidencia Individual — Semana 1
@@ -39,3 +64,6 @@ Actualmente los estados dependen de un booleano local y datos sintéticos en mem
 - **Nombre:** Alexis Montalvo Osorio (3523110113)
 - **Repositorio y commit evaluado:** Pull Request #2 fusionado en `main`: https://github.com/CharlyLP04/pwa-equipo9/pull/2
 - **Mi contribución concreta:** Redacción de problema, contexto y escenarios de conectividad intermitente en `docs/requirements.md`.
+
+
+

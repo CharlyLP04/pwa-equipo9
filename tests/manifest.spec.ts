@@ -48,6 +48,56 @@ async function runTests() {
   assert.ok(has512, "El manifest debe incluir al menos un icono de 512x512.");
   assert.ok(hasMaskable, "El manifest debe incluir al menos un icono con propósito maskable.");
 
+  // Validación de shortcuts del Web App Manifest
+assert.ok(
+  Array.isArray(manifest.shortcuts),
+  "El manifest debe incluir un arreglo 'shortcuts'."
+);
+
+assert.ok(
+  manifest.shortcuts.length >= 1,
+  "El manifest debe incluir al menos un shortcut."
+);
+
+for (const shortcut of manifest.shortcuts) {
+  assert.ok(
+    typeof shortcut.name === "string" && shortcut.name.trim().length > 0,
+    "Cada shortcut debe incluir un nombre válido."
+  );
+
+  assert.ok(
+    typeof shortcut.url === "string" && shortcut.url.startsWith("/"),
+    "Cada shortcut debe incluir una URL interna válida."
+  );
+}
+
+console.log("✓ Shortcuts del manifest validados correctamente.");
+
+  // Validación de shortcuts del Web App Manifest
+assert.ok(
+  Array.isArray(manifest.shortcuts),
+  "El manifest debe incluir un arreglo 'shortcuts'."
+);
+
+assert.ok(
+  manifest.shortcuts.length >= 1,
+  "El manifest debe incluir al menos un shortcut."
+);
+
+for (const shortcut of manifest.shortcuts) {
+  assert.ok(
+    typeof shortcut.name === "string" && shortcut.name.trim().length > 0,
+    "Cada shortcut debe incluir un nombre válido."
+  );
+
+  assert.ok(
+    typeof shortcut.url === "string" && shortcut.url.startsWith("/"),
+    "Cada shortcut debe incluir una URL interna válida."
+  );
+}
+
+console.log("✓ Shortcuts del manifest validados correctamente.");
+
   for (const icon of manifest.icons) {
     const iconRelativePath = icon.src.startsWith("/") ? icon.src.slice(1) : icon.src;
     const iconFullPath = resolve(root, "public", iconRelativePath);
@@ -76,6 +126,16 @@ async function runTests() {
   const hasMainLandmark = shellContent.includes("<main") || shellContent.includes('role="main"');
   assert.ok(hasMainLandmark, "El App Shell debe contener el landmark semántico principal (<main> o role='main').");
 
+  // La navegación debe proporcionar un nombre accesible
+const hasAccessibleNav =
+  shellContent.includes("aria-label") ||
+  shellContent.includes("aria-labelledby");
+
+assert.ok(
+  hasAccessibleNav,
+  "La navegación debe incluir aria-label o aria-labelledby para tener un nombre accesible."
+);
+
   // Barra superior con título de laboratorio de la UTT
   assert.match(shellContent, /Universidad Tecnológica de Tehuacán/i, "El Header debe incluir la referencia institucional a la UTT.");
   assert.match(shellContent, /Laboratorio/i, "El Header debe incluir el título del laboratorio.");
@@ -83,6 +143,8 @@ async function runTests() {
   // Barra de navegación accesible
   const hasNavLandmark = shellContent.includes("<nav") || shellContent.includes('role="navigation"');
   assert.ok(hasNavLandmark, "El App Shell debe implementar una barra de navegación accesible (<nav>).");
+
+  
 
   // Componentes auxiliares de resiliencia
   assert.match(shellContent, /export function LoadingState/, "El App Shell debe exportar el componente LoadingState.");
