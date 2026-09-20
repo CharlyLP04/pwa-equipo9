@@ -1,7 +1,7 @@
 # Evidencia Individual
 
 - **Estudiante:** Carlos Olaya Gutierrez
-- **Commit SHA evaluado:** `[ESPACIO_PARA_EL_HASH]`
+- **Commit SHA evaluado:** `23ea6e84d72d2be653f5387d8cb27aa8961be4e8`
 - **Decisión técnica que puedo explicar:**  
   Implementé una arquitectura híbrida de almacenamiento en caché en el Service Worker con la API nativa de W3C, priorizando Network-First con fallback a datos sintéticos para las inspecciones de laboratorio. Esta decisión garantiza que los técnicos reciban siempre datos actualizados cuando hay conexión y, en caso de corte, la interfaz se mantenga operativa sin colapsar mediante registros sintéticos preconstruidos. Para los recursos estáticos del App Shell (estilos, scripts, manifest, iconos), apliqué Cache-First para acelerar el renderizado inicial y minimizar el consumo de red.
 
@@ -24,7 +24,7 @@
 
 ## Montalvo Osorio Alexis (3523110113)
 
-- **Commit SHA individual:** `91f59fad6ac6f3bf021e88f5ac0ba4c83cb16747`
+- **Commit SHA individual:** `6f51bf14cb214ca304e8b9aa51d1b9debe15d1e8`
 - **Contribución técnica:** Implementación del módulo de registro del Service Worker en `src/lib/pwa/register-service-worker.ts` e integración con el App Shell en `src/components/app-shell.tsx`.
 - **Registro del Service Worker:** Se creó la función `registerServiceWorker()`, la cual comprueba si el navegador es compatible con Service Workers mediante la validación de `serviceWorker in navigator`. Si existe compatibilidad, registra el archivo `/sw.js` cuando termina de cargar la ventana.
 - **Integración con el App Shell:** La función de registro se ejecuta dentro de un `useEffect` en el componente `AppShell`, evitando ejecutar efectos secundarios directamente durante el renderizado del componente.
