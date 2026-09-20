@@ -35,3 +35,47 @@
 - **Limitación encontrada:** El archivo `public/sw.js` pertenece al trabajo de otro integrante y debe integrarse para comprobar el funcionamiento completo del registro y de las funcionalidades offline.
 - **Uso declarado de IA:** Se utilizó asistencia de IA para revisar la estructura del módulo TypeScript, el registro del Service Worker y su integración con React. El código fue revisado y validado localmente.
 
+
+## Evidencia Individual — Semana 03
+
+**Nombre:** Carlos Alberto Pacheco Avila
+
+**Matrícula:** 3523110057
+
+**Rol:** Pruebas automatizadas y QA Offline.
+
+**Commit SHA:** Pendiente de generar.
+
+### 1. Contribución realizada
+
+Se implementaron dos suites de pruebas automatizadas:
+
+* `tests/service-worker.spec.ts`: validación de los eventos del Service Worker, configuración de cachés, precarga de recursos y mecanismos de contingencia.
+* `tests/offline.spec.ts`: validación de la página offline, presencia de datos sintéticos y simulación de una navegación sin conexión.
+
+También se actualizó `package.json` para incorporar las pruebas al comando `npm test` y se documentó su ejecución en `README.md`.
+
+### 2. Decisión técnica
+
+Se utilizó `tsx` para ejecutar las pruebas TypeScript y el módulo `node:vm` para simular el entorno del Service Worker sin depender de un navegador.
+
+Las pruebas permiten detectar regresiones en la configuración de cachés, eventos y mecanismos de contingencia.
+
+### 3. Pruebas ejecutadas
+
+* `npm test`: PASS. Cuatro suites completadas.
+* `npm run build`: PASS. Compilación de producción exitosa.
+* `npm run verify`: PASS. Verificación de artefactos correcta.
+
+### 4. Limitación encontrada
+
+Las pruebas verifican principalmente la estructura del Service Worker y simulan una navegación sin red. No se realizó una auditoría completa de funcionamiento offline en un navegador real.
+
+### 5. Uso declarado de IA
+
+**Herramienta:** ChatGPT.
+
+**Propósito:** Apoyo para el diseño de pruebas automatizadas, simulación de contingencia offline y resolución de errores de ejecución de TypeScript.
+
+**Validación humana:** Se revisaron los archivos implementados y se ejecutaron las pruebas, compilación y verificación en el entorno local, obteniendo resultados PASS.
+

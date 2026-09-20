@@ -148,3 +148,53 @@ pwa-equipo9/
 - Integración del **Service Worker** con Workbox / Serwist o vanilla Service Worker.
 - Estrategias de caché (`CacheFirst` para assets estáticos y shell, `StaleWhileRevalidate` para inspecciones).
 - Sincronización en segundo plano (*Background Sync*) y persistencia en IndexedDB.
+
+
+## Semana 03 — Service Worker y QA Offline
+
+### Ejecución y verificación
+
+Instalar las dependencias:
+
+```bash
+npm ci
+```
+
+Ejecutar las pruebas automatizadas:
+
+```bash
+npm test
+```
+
+Generar la compilación de producción:
+
+```bash
+npm run build
+```
+
+Ejecutar la verificación del proyecto:
+
+```bash
+make verify
+```
+
+Si `make` no está disponible en Windows, utilizar el comando equivalente:
+
+```bash
+npm run verify
+```
+
+### Pruebas automatizadas
+
+* `tests/service-worker.spec.ts`: verifica los eventos `install`, `activate` y `fetch`, las cachés, los recursos de precarga y las estrategias del Service Worker.
+* `tests/offline.spec.ts`: valida la página de contingencia, los datos sintéticos y simula una navegación sin conexión ni recursos almacenados.
+
+### Resultados de verificación
+
+* `npm test`: PASS.
+* `npm run build`: PASS.
+* `npm run verify`: PASS.
+
+### Limitaciones
+
+Las pruebas incluyen validaciones estructurales y una simulación del Service Worker mediante APIs controladas. No sustituyen las pruebas manuales de instalación y funcionamiento offline en un navegador real.
