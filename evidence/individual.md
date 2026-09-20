@@ -44,7 +44,7 @@
 
 **Rol:** Pruebas automatizadas y QA Offline.
 
-**Commit SHA:** Pendiente de generar.
+**Commit SHA:** `1bcb0a8d5f2d8b9aaac9bc16a6bfdf16cd703734`
 
 ### 1. Contribución realizada
 
