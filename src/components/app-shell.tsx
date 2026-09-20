@@ -1,6 +1,7 @@
 "use client";
 
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
+import { registerServiceWorker } from "@/lib/pwa/register-service-worker";
 
 export interface AppShellProps {
   children?: ReactNode;
@@ -158,7 +159,11 @@ export function AppShell({
   onNavSelect,
   statusBadge = "PWA Shell Activo"
 }: AppShellProps) {
-  const navItems = [
+  useEffect(() => {
+    registerServiceWorker();
+  }, []);
+  
+   const navItems = [
     {
       id: "inspecciones",
       label: "Inspecciones",
