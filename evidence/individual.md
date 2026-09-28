@@ -19,7 +19,7 @@
 
 ## Pacheco Avila Carlos Alberto (3523110057)
 
-- **Commit SHA individual:** `[PENDIENTE_PACHECO_SEMANA_04]`
+- **Commit SHA individual:** `f47dbe859ac5fdb3a77271ed45c039f18172e7fb`
 - **Contribución técnica:** Suite de pruebas automatizadas de renderizado (`tests/rendering.spec.ts`) y actualización de README/CI.
 - **Decisión técnica que puedo explicar:** Implementé pruebas reproducibles para verificar los contratos críticos de renderizado de la Semana 04. La ruta `/inspecciones` se valida como Server Component comprobando que no utilice la directiva `"use client"`, mientras que `/inspecciones/[id]` se valida como Client Component. También se comprueba que el estado de carga utilice `aria-busy="true"` y `role="status"`, y que un identificador inválido produzca un estado de error controlado.
 - **Prueba que ejecuté y resultado:** Ejecuté `npm.cmd test`, incluyendo `tests/rendering.spec.ts`, con resultado PASS. También ejecuté `npm.cmd run build` y `npm.cmd run verify`, ambos con resultado PASS.
