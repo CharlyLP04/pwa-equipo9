@@ -198,3 +198,21 @@ npm run verify
 ### Limitaciones
 
 Las pruebas incluyen validaciones estructurales y una simulación del Service Worker mediante APIs controladas. No sustituyen las pruebas manuales de instalación y funcionamiento offline en un navegador real.
+
+
+## Semana 04 — Renderizado CSR y Server Component
+
+### Implementación
+
+Durante la Semana 04 se implementaron y compararon dos estrategias de renderizado para las rutas de inspecciones:
+
+- `/inspecciones`: listado implementado como Server Component y prerenderizado por Next.js.
+- `/inspecciones/[id]`: detalle implementado como Client Component (CSR) para permitir interacción y manejo de estado local.
+- `LoadingState`: estado de carga accesible mediante `role="status"` y `aria-busy="true"`.
+- Manejo controlado de identificadores de inspección inexistentes.
+- Todos los datos utilizados son sintéticos.
+
+### Instalación limpia
+
+```bash
+npm ci

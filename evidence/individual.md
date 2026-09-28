@@ -18,12 +18,13 @@
 - **Uso declarado de IA:** *(Completar por Alexis)*
 
 ## Pacheco Avila Carlos Alberto (3523110057)
-- **Commit SHA individual:** `[PENDIENTE_PACHECO_SEMANA_04]`
+
+- **Commit SHA individual:** `f47dbe859ac5fdb3a77271ed45c039f18172e7fb`
 - **Contribución técnica:** Suite de pruebas automatizadas de renderizado (`tests/rendering.spec.ts`) y actualización de README/CI.
-- **Decisión técnica que puedo explicar:** *(Completar por Pacheco)*
-- **Prueba que ejecuté y resultado:** *(Completar por Pacheco)*
-- **Limitación o fallo diagnosticado:** *(Completar por Pacheco)*
-- **Uso declarado de IA:** *(Completar por Pacheco)*
+- **Decisión técnica que puedo explicar:** Implementé pruebas reproducibles para verificar los contratos críticos de renderizado de la Semana 04. La ruta `/inspecciones` se valida como Server Component comprobando que no utilice la directiva `"use client"`, mientras que `/inspecciones/[id]` se valida como Client Component. También se comprueba que el estado de carga utilice `aria-busy="true"` y `role="status"`, y que un identificador inválido produzca un estado de error controlado.
+- **Prueba que ejecuté y resultado:** Ejecuté `npm.cmd test`, incluyendo `tests/rendering.spec.ts`, con resultado PASS. También ejecuté `npm.cmd run build` y `npm.cmd run verify`, ambos con resultado PASS.
+- **Limitación o fallo diagnosticado:** Las pruebas validan contratos estructurales, accesibilidad y manejo de estados críticos, pero no sustituyen pruebas end-to-end en un navegador real ni mediciones reales de rendimiento entre las estrategias de renderizado.
+- **Uso declarado de IA:** Se utilizó ChatGPT como apoyo para diseñar la suite de pruebas, revisar los contratos CSR/Server Component, resolver aspectos técnicos y redactar la documentación. Los cambios fueron revisados y validados mediante pruebas locales antes de la entrega.
 
 ---
 
