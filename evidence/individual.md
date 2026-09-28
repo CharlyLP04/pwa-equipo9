@@ -79,3 +79,25 @@ Las pruebas verifican principalmente la estructura del Service Worker y simulan 
 
 **Validación humana:** Se revisaron los archivos implementados y se ejecutaron las pruebas, compilación y verificación en el entorno local, obteniendo resultados PASS.
 
+
+---
+
+# Evidencia Individual — Semana 04
+
+## Montalvo Osorio Alexis (3523110113)
+
+- **Commit SHA individual:** [AGREGAR SHA]
+
+- **Contribución técnica:** Implementación de la ruta `src/app/inspecciones/page.tsx` correspondiente al listado de inspecciones de la Semana 04. La página utiliza un Server Component de Next.js y consume directamente los datos sintéticos definidos en `src/lib/data/inspections.ts`.
+
+- **Implementación SSR:** La ruta `/inspecciones` fue implementada sin `"use client"`, `useState` ni `useEffect`, permitiendo que el listado sea renderizado como Server Component. Se muestran la ubicación del laboratorio, fecha, responsable, estado, cantidad de hallazgos y resumen de cada inspección.
+
+- **Navegación al detalle:** Cada tarjeta de inspección incluye un enlace mediante `Link` de Next.js hacia `/inspecciones/[id]`, dejando preparada la navegación hacia la vista de detalle que será implementada por otro integrante del equipo.
+
+- **Integración visual:** Se reutilizó el `AppShell` existente y las clases definidas en `src/app/globals.css`, evitando duplicar estilos o modificar innecesariamente la estructura visual existente del proyecto.
+
+- **Validación y pruebas:** Se ejecutó `npm run build`. La compilación finalizó correctamente, incluyendo la compilación, validación de tipos, generación de páginas y generación de la ruta `/inspecciones`.
+
+- **Limitación encontrada:** La implementación individual corresponde únicamente a la ruta `/inspecciones`. La página de detalle `/inspecciones/[id]`, la decisión documental global CSR vs SSR, las pruebas específicas de rendering y el workflow de Semana 04 corresponden al trabajo de otros integrantes del equipo.
+
+- **Uso declarado de IA:** Se utilizó ChatGPT como asistente de pair programming para revisar la estructura existente del proyecto, orientar la implementación del Server Component y revisar los cambios realizados. La implementación fue validada manualmente y mediante la ejecución local de `npm run build`.
