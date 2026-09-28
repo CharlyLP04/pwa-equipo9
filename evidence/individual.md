@@ -10,12 +10,12 @@
 - **Uso declarado de IA (herramienta, propósito, validación):** Utilicé Antigravity 2.0 (Google DeepMind) y Gemini como asistente de *pair programming* para estructurar la ruta dinámica, diseñar la accesibilidad del componente `LoadingState` y redactar la matriz comparativa de métricas en `docs/rendering-decision.md`. Validé humanamente el código asegurando la eliminación de palabras sensibles para el escáner de seguridad y comprobando que no existan errores de compilación ni dependencias no declaradas.
 
 ## Montalvo Osorio Alexis (3523110113)
-- **Commit SHA individual:** `[PENDIENTE_ALEXIS_SEMANA_04]`
-- **Contribución técnica:** Implementación de la ruta de listado general de inspecciones (`src/app/inspecciones/page.tsx`) con Server-Side Rendering (SSR).
-- **Decisión técnica que puedo explicar:** *(Completar por Alexis)*
-- **Prueba que ejecuté y resultado:** *(Completar por Alexis)*
-- **Limitación o fallo diagnosticado:** *(Completar por Alexis)*
-- **Uso declarado de IA:** *(Completar por Alexis)*
+- **Commit SHA individual:** `0fdd41bf97c8ebc75d5c0a486ade6aba902d671a`
+- **Contribución técnica:** Implementación de la ruta `src/app/inspecciones/page.tsx` correspondiente al listado de inspecciones de la Semana 04 mediante un Server Component de Next.js que consume los datos sintéticos de `src/lib/data/inspections.ts`.
+- **Decisión técnica que puedo explicar:** La ruta `/inspecciones` fue implementada como Server Component (sin `"use client"`), permitiendo que el listado se renderice en el servidor con HTML pre-generado, menor First Contentful Paint (FCP) y cero cascada de peticiones cliente. Cada tarjeta incluye un enlace accesible hacia `/inspecciones/[id]`.
+- **Prueba que ejecuté y resultado:** Se ejecutaron `npm run build` y `npm test`. La compilación y las pruebas automatizadas de renderizado finalizaron exitosamente (PASS).
+- **Limitación o fallo diagnosticado:** La implementación del listado como Server Component puro depende de conectividad con el servidor si no está en la caché del navegador; ante caídas de red, se apoya en el Service Worker y `offline.html`.
+- **Uso declarado de IA:** Se utilizó ChatGPT para asistir en la estructura del Server Component y en la integración con el App Shell; los cambios fueron verificados y validados en el entorno local.
 
 ## Pacheco Avila Carlos Alberto (3523110057)
 
