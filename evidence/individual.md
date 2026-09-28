@@ -49,6 +49,74 @@
 - **Limitación encontrada:** El archivo `public/sw.js` pertenece al trabajo de otro integrante y debe integrarse para comprobar el funcionamiento completo del registro y de las funcionalidades offline.
 - **Uso declarado de IA:** Se utilizó asistencia de IA para revisar la estructura del módulo TypeScript, el registro del Service Worker y su integración con React. El código fue revisado y validado localmente.
 
+
+
+## Evidencia Individual — Semana 03
+
+**Nombre:** Carlos Alberto Pacheco Avila
+
+**Matrícula:** 3523110057
+
+**Rol:** Pruebas automatizadas y QA Offline.
+
+**Commit SHA:** `1bcb0a8d5f2d8b9aaac9bc16a6bfdf16cd703734`
+
+### 1. Contribución realizada
+
+Se implementaron dos suites de pruebas automatizadas:
+
+* `tests/service-worker.spec.ts`: validación de los eventos del Service Worker, configuración de cachés, precarga de recursos y mecanismos de contingencia.
+* `tests/offline.spec.ts`: validación de la página offline, presencia de datos sintéticos y simulación de una navegación sin conexión.
+
+También se actualizó `package.json` para incorporar las pruebas al comando `npm test` y se documentó su ejecución en `README.md`.
+
+### 2. Decisión técnica
+
+Se utilizó `tsx` para ejecutar las pruebas TypeScript y el módulo `node:vm` para simular el entorno del Service Worker sin depender de un navegador.
+
+Las pruebas permiten detectar regresiones en la configuración de cachés, eventos y mecanismos de contingencia.
+
+### 3. Pruebas ejecutadas
+
+* `npm test`: PASS. Cuatro suites completadas.
+* `npm run build`: PASS. Compilación de producción exitosa.
+* `npm run verify`: PASS. Verificación de artefactos correcta.
+
+### 4. Limitación encontrada
+
+Las pruebas verifican principalmente la estructura del Service Worker y simulan una navegación sin red. No se realizó una auditoría completa de funcionamiento offline en un navegador real.
+
+### 5. Uso declarado de IA
+
+**Herramienta:** ChatGPT.
+
+**Propósito:** Apoyo para el diseño de pruebas automatizadas, simulación de contingencia offline y resolución de errores de ejecución de TypeScript.
+
+**Validación humana:** Se revisaron los archivos implementados y se ejecutaron las pruebas, compilación y verificación en el entorno local, obteniendo resultados PASS.
+
+
+---
+
+# Evidencia Individual — Semana 04
+
+## Montalvo Osorio Alexis (3523110113)
+
+- **Commit SHA individual:** [AGREGAR SHA]
+
+- **Contribución técnica:** Implementación de la ruta `src/app/inspecciones/page.tsx` correspondiente al listado de inspecciones de la Semana 04. La página utiliza un Server Component de Next.js y consume directamente los datos sintéticos definidos en `src/lib/data/inspections.ts`.
+
+- **Implementación SSR:** La ruta `/inspecciones` fue implementada sin `"use client"`, `useState` ni `useEffect`, permitiendo que el listado sea renderizado como Server Component. Se muestran la ubicación del laboratorio, fecha, responsable, estado, cantidad de hallazgos y resumen de cada inspección.
+
+- **Navegación al detalle:** Cada tarjeta de inspección incluye un enlace mediante `Link` de Next.js hacia `/inspecciones/[id]`, dejando preparada la navegación hacia la vista de detalle que será implementada por otro integrante del equipo.
+
+- **Integración visual:** Se reutilizó el `AppShell` existente y las clases definidas en `src/app/globals.css`, evitando duplicar estilos o modificar innecesariamente la estructura visual existente del proyecto.
+
+- **Validación y pruebas:** Se ejecutó `npm run build`. La compilación finalizó correctamente, incluyendo la compilación, validación de tipos, generación de páginas y generación de la ruta `/inspecciones`.
+
+- **Limitación encontrada:** La implementación individual corresponde únicamente a la ruta `/inspecciones`. La página de detalle `/inspecciones/[id]`, la decisión documental global CSR vs SSR, las pruebas específicas de rendering y el workflow de Semana 04 corresponden al trabajo de otros integrantes del equipo.
+
+- **Uso declarado de IA:** Se utilizó ChatGPT como asistente de pair programming para revisar la estructura existente del proyecto, orientar la implementación del Server Component y revisar los cambios realizados. La implementación fue validada manualmente y mediante la ejecución local de `npm run build`.
+
 ## Pacheco Avila Carlos Alberto (3523110057)
 - **Commit SHA individual:** `1bcb0a8d5f2d8b9aaac9bc16a6bfdf16cd703734`
 - **Contribución técnica:** Suites de pruebas automatizadas para Service Worker y contingencia offline (`tests/service-worker.spec.ts`, `tests/offline.spec.ts`).
