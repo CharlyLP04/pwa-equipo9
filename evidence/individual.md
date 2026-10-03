@@ -124,3 +124,22 @@ Las pruebas verifican principalmente la estructura del Service Worker y simulan 
 - **Pruebas ejecutadas:** `npm test`, `npm run build` y `npm run verify` con salida PASS en todas las suites.
 - **Limitación encontrada:** Las pruebas verifican principalmente la estructura del Service Worker y simulan una navegación sin red. No se realizó una auditoría completa de funcionamiento offline en un navegador real.
 - **Uso declarado de IA:** Apoyo con ChatGPT para el diseño de pruebas y simulación de contingencia offline; validado y verificado en el entorno local.
+
+
+----------------------------------
+
+# Evidencia Individual — Semana 05
+
+## Montalvo Osorio Alexis (3523110113)
+
+- **Commit SHA individual:** [AGREGAR SHA]
+
+- **Contribución técnica:** Implementación del esquema de persistencia local en `src/lib/storage/schema.ts` y de la política de resolución de conflictos en `src/lib/sync/conflict-policy.ts`.
+
+- **Decisión técnica:** Se definió un registro local de inspección con versión y fecha de actualización (`updatedAt`). Para resolver conflictos entre cambios de una misma inspección, la política compara primero la versión, después la fecha de actualización y, en caso de empate, utiliza una comparación determinista para evitar resultados diferentes ante los mismos datos.
+
+- **Prueba ejecutada y resultado:** Se ejecutó `npx tsc --noEmit` para comprobar la validación de tipos del proyecto. El comando terminó correctamente y no reportó errores.
+
+- **Limitación encontrada:** En esta etapa todavía no se implementa la cola de sincronización ni la persistencia real en IndexedDB. Esas funciones se integrarán con `src/lib/sync/queue.ts` y las pruebas correspondientes de la Semana 05.
+
+- **Uso declarado de IA:** Se utilizó ChatGPT como apoyo de pair programming para revisar la estructura del esquema, definir los tipos de los registros locales y diseñar la política de resolución de conflictos. Los cambios fueron revisados manualmente y validados mediante la compilación de TypeScript.
