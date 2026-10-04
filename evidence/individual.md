@@ -1,4 +1,25 @@
-# Evidencia Individual - Semana 04
+# Evidencia Individual - Semana 05
+
+## Carlos Olaya Gutiérrez (3523110786)
+- **Commit SHA individual:** `09e787d0087ab7b234b1f54d2999ad8b3cf7f06d`
+- **Contribución técnica:** Diseño e implementación del motor de cola de sincronización offline (`src/lib/sync/queue.ts`) bajo el patrón *Transactional Outbox* y redacción de la política arquitectónica de persistencia y resolución de conflictos (`docs/sync-policy.md`).
+- **Decisión técnica que puedo explicar:** Implementé una máquina de estados finita determinista (`pending` → `inFlight` → `done` | `failed`) con llaves de idempotencia estables (`idempotencyKey`), control de obsolescencia por número de revisión (`revision`) y retroceso exponencial acotado (*exponential backoff*: $\min(60000, 1000 \times 2^{\text{attempts}-1})$ ms). Esta decisión garantiza entrega exactamente efectiva (*effectively-once*): si un reintento se dispara por caída de conexión tras procesar en el servidor, el registro por `idempotencyKey` absorbe el duplicado sin crear doble inspección, y el control de `revision` impide que confirmaciones de red atrasadas (*out-of-order ACKs*) sobrescriban el estado local más reciente. Además, el método `resume(now)` reanuda operaciones huérfanas tras cierres inesperados de pestaña.
+- **Prueba que ejecuté y resultado:** Verificación estática de tipos con `npx tsc --noEmit`, ejecución de suite de pruebas del repositorio (`npm test`) y validación funcional de los cinco escenarios críticos del motor (`offline capture`, `retry duplicate`, `out-of-order`, `resume queue`, `backoff y límite de intentos`), todas con resultado PASS.
+- **Limitación o fallo diagnosticado:** El adaptador de persistencia por defecto opera sobre un almacén en memoria o snapshot JSON (`MemoryQueueStorage` / `localStorage`), por lo que en entornos de navegador con almacenamiento restringido o modo incógnito la cuota puede agotarse si se encolan adjuntos pesados sin compactar mediante `dequeueDone()`. Asimismo, cuando una operación alcanza `maxAttempts` y transiciona a `failed`, requiere intervención explícita o re-encolado manual para destrabar el flujo.
+- **Cambio que podría defender o modificar en vivo:** Puedo explicar y modificar en vivo la fórmula de *exponential backoff* en `computeBackoffMs`, la condición de descarte de respuestas fuera de orden (`item.revision <= ackedRev`) dentro de `processPending`, la deduplicación por `idempotencyKey` en `enqueue` y la lógica de recuperación de elementos `inFlight` al invocar `resume(now)`.
+- **Uso declarado de IA (herramienta, propósito, validación):** Utilicé Antigravity 2.0 (Google DeepMind) y Gemini como asistente de *pair programming* para estructurar las interfaces tipadas de `SyncQueue`, modelar los diagramas de transición y documentar los trade-offs de estrategias de conflicto en `docs/sync-policy.md`. Validé humanamente cada transición de estado, comprobé la compatibilidad con el target ES5 de TypeScript y verifiqué que ningún archivo contuviera cadenas prohibidas por el escáner de seguridad.
+
+## Montalvo Osorio Alexis (3523110113)
+- **Commit SHA individual:** `[PENDIENTE POR INTEGRANTE 2]`
+- **Contribución técnica:** `[Pendiente de registrar por Montalvo Osorio Alexis: src/lib/storage/schema.ts y src/lib/sync/conflict-policy.ts]`
+
+## Pacheco Avila Carlos Alberto (3523110057)
+- **Commit SHA individual:** `[PENDIENTE POR INTEGRANTE 3]`
+- **Contribución técnica:** `[Pendiente de registrar por Pacheco Avila Carlos Alberto: tests/sync.spec.ts, README.md y workflow CI Semana 05]`
+
+---
+
+# Histórico: Evidencia Individual - Semana 04
 
 ## Carlos Olaya Gutiérrez (3523110786)
 - **Commit SHA individual:** `c034a80b001712a2a09cff98c0b29ce1a1343729`
