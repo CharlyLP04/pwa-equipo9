@@ -14,8 +14,13 @@
 - **Contribución técnica:** `[Pendiente de registrar por Montalvo Osorio Alexis: src/lib/storage/schema.ts y src/lib/sync/conflict-policy.ts]`
 
 ## Pacheco Avila Carlos Alberto (3523110057)
-- **Commit SHA individual:** `[PENDIENTE POR INTEGRANTE 3]`
-- **Contribución técnica:** `[Pendiente de registrar por Pacheco Avila Carlos Alberto: tests/sync.spec.ts, README.md y workflow CI Semana 05]`
+- **Commit SHA individual:** `38bdabed06c3bc327156b58fb3a22cd70782fa26`
+- **Contribución técnica:** Implementación de la suite automatizada `tests/sync.spec.ts`, integración de las pruebas de sincronización al comando `npm test`, incorporación del workflow oficial `.github/workflows/week-05-w05-sync-data.yml` y actualización de la documentación de Semana 05 en `README.md`.
+- **Decisión técnica que puedo explicar:** Las pruebas se diseñaron de forma determinista y con datos sintéticos para validar la lógica de sincronización sin depender de servicios externos. Se comprueba la validación del esquema local, la idempotencia mediante `operationId`, los reintentos después de un fallo y la resolución determinista de conflictos por versión y `updatedAt`.
+- **Prueba que ejecuté y resultado:** Ejecuté `npm.cmd test`, incluyendo `tests/sync.spec.ts`, y todas las suites finalizaron con resultado PASS. También ejecuté `npm.cmd run build` y `npm.cmd run verify`, ambos con resultado PASS.
+- **Limitación o fallo diagnosticado:** Durante la implementación, `tests/sync.spec.ts` inicialmente utilizaba `await` en el nivel superior y `tsx` produjo un error por el formato CommonJS. Se corrigió encapsulando las pruebas asíncronas en una función `async` y manejando explícitamente los errores. Además, las pruebas utilizan almacenamiento controlado en memoria y no sustituyen una prueba end-to-end con persistencia real en el navegador.
+- **Cambio que podría defender o modificar en vivo:** Puedo explicar y modificar las pruebas de idempotencia, el escenario de reintento después de un fallo y las comprobaciones de resolución de conflictos entre registros locales y remotos.
+- **Uso declarado de IA:** Se utilizó ChatGPT como apoyo para diseñar la suite de pruebas, analizar el comportamiento de la cola de sincronización, resolver el error de ejecución asíncrona y redactar la documentación. Los cambios fueron revisados y validados mediante pruebas, compilación y verificación local.
 
 ---
 
