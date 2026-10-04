@@ -17,6 +17,15 @@ const required = [
   "tests/manifest.spec.ts",
   "public/icons/icon-192x192.png",
   "public/icons/icon-512x512.png",
+  "public/sw.js",
+  "public/offline.html",
+  "src/app/inspecciones/page.tsx",
+  "src/app/inspecciones/[id]/page.tsx",
+  "src/lib/sync/queue.ts",
+  "src/lib/storage/schema.ts",
+  "src/lib/sync/conflict-policy.ts",
+  "docs/sync-policy.md",
+  "tests/sync.spec.ts",
   "evidence/individual.md"
 ];
 

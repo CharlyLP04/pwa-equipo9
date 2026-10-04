@@ -212,7 +212,52 @@ Durante la Semana 04 se implementaron y compararon dos estrategias de renderizad
 - Manejo controlado de identificadores de inspección inexistentes.
 - Todos los datos utilizados son sintéticos.
 
-### Instalación limpia
+### Instalación limpia y verificación
 
 ```bash
 npm ci
+npm test
+npm run build
+npm run verify
+```
+
+---
+
+## 🔄 Semana 05 — Persistencia local y sincronización idempotente
+
+### Implementación
+
+Durante la Semana 05 se incorporó la capa de persistencia y sincronización *offline-first* para las inspecciones de mantenimiento de laboratorios (utilizando exclusivamente datos sintéticos):
+
+- `src/lib/storage/schema.ts`: define y valida los registros locales (`LocalInspectionRecord`, `isLocalInspectionRecord`) y operaciones pendientes (`PendingOperation`, `isPendingOperation`).
+- `src/lib/sync/queue.ts`: administra la cola de operaciones offline (*Transactional Outbox*), ciclo determinista (`pending` → `inFlight` → `done` | `failed`), *exponential backoff*, idempotencia (`operationId` / `idempotencyKey`), descarte de respuestas fuera de orden (*out-of-order ACK*) y reanudación (`resume`) tras cierre de pestaña.
+- `src/lib/sync/conflict-policy.ts`: resuelve conflictos entre versiones locales y remotas de forma determinista (`higher-version`, `newer-updatedAt` y `deterministic-tie-break`).
+- `docs/sync-policy.md`: documenta la arquitectura, garantías de idempotencia, estrategias de resolución de conflictos, supuestos, límites y riesgos mitigados.
+- `tests/sync.spec.ts`: valida automáticamente el esquema, la cola offline, los reintentos con backoff, la prevención de duplicados en cliente y servidor, el rechazo de confirmaciones fuera de orden, la recuperación tras recarga y la resolución determinista de conflictos.
+
+### Setup, ejecución y verificación reproducible
+
+```bash
+# 1. Instalación limpia desde lockfile
+npm ci
+
+# 2. Ejecución de todas las suites de pruebas (Semanas 01 a 05)
+npm test
+
+# 3. Compilación de producción
+npm run build
+
+# 4. Verificación reproducible de artefactos (genera reports/verification.json)
+make verify
+# Equivalente exacto en Windows sin GNU Make:
+npm run verify
+
+# 5. Ejecución de checks públicos oficiales de la Semana 05
+bash public-tests/check.sh
+```
+
+### Evidencia y documentación técnica
+
+- **Política de sincronización y conflictos:** [`docs/sync-policy.md`](./docs/sync-policy.md)
+- **Evidencia individual del equipo (Semanas 01–05):** [`evidence/individual.md`](./evidence/individual.md)
+- **Workflow CI Semana 05:** [`.github/workflows/week-05-w05-sync-data.yml`](./.github/workflows/week-05-w05-sync-data.yml)
