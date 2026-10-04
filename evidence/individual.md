@@ -10,8 +10,13 @@
 - **Uso declarado de IA (herramienta, propósito, validación):** Utilicé Antigravity 2.0 (Google DeepMind) y Gemini como asistente de *pair programming* para estructurar las interfaces tipadas de `SyncQueue`, modelar los diagramas de transición y documentar los trade-offs de estrategias de conflicto en `docs/sync-policy.md`. Validé humanamente cada transición de estado, comprobé la compatibilidad con el target ES5 de TypeScript y verifiqué que ningún archivo contuviera cadenas prohibidas por el escáner de seguridad.
 
 ## Montalvo Osorio Alexis (3523110113)
-- **Commit SHA individual:** `[PENDIENTE POR INTEGRANTE 2]`
-- **Contribución técnica:** `[Pendiente de registrar por Montalvo Osorio Alexis: src/lib/storage/schema.ts y src/lib/sync/conflict-policy.ts]`
+- **Commit SHA individual:** `34a22fdfe3ff33ca4c649b0a991a94d0c2f5847e`
+- **Contribución técnica:** Implementación del esquema de persistencia local en `src/lib/storage/schema.ts` y de la política de resolución de conflictos en `src/lib/sync/conflict-policy.ts`.
+- **Decisión técnica que puedo explicar:** Se definió un registro local de inspección con versión y fecha de actualización (`updatedAt`). Para resolver conflictos entre cambios de una misma inspección, la política compara primero la versión (`higher-version`), después la fecha de actualización (`newer-updatedAt`) y, en caso de empate, utiliza una comparación determinista (`deterministic-tie-break`) para evitar resultados diferentes ante los mismos datos.
+- **Prueba que ejecuté y resultado:** Se ejecutó `npx tsc --noEmit`, `npm test` y `npm run build` para comprobar la validación de tipos, las guardas de esquema y la política de conflictos. Todos los comandos terminaron correctamente con resultado PASS.
+- **Limitación o fallo diagnosticado:** El esquema valida la estructura en tiempo de ejecución mediante type guards, pero delega la persistencia transaccional y el encolado a `src/lib/sync/queue.ts`.
+- **Cambio que podría defender o modificar en vivo:** Puedo explicar y modificar en vivo las validaciones de `isLocalInspectionRecord` e `isPendingOperation` en `src/lib/storage/schema.ts`, así como el orden de precedencia en `resolveConflict` dentro de `src/lib/sync/conflict-policy.ts`.
+- **Uso declarado de IA:** Se utilizó ChatGPT como apoyo de pair programming para revisar la estructura del esquema, definir los tipos de los registros locales y diseñar la política de resolución de conflictos. Los cambios fueron revisados manualmente y validados mediante la compilación de TypeScript y la suite de pruebas.
 
 ## Pacheco Avila Carlos Alberto (3523110057)
 - **Commit SHA individual:** `38bdabed06c3bc327156b58fb3a22cd70782fa26`
@@ -128,7 +133,7 @@ Las pruebas verifican principalmente la estructura del Service Worker y simulan 
 
 ## Montalvo Osorio Alexis (3523110113)
 
-- **Commit SHA individual:** [AGREGAR SHA]
+- **Commit SHA individual:** `0fdd41bf97c8ebc75d5c0a486ade6aba902d671a`
 
 - **Contribución técnica:** Implementación de la ruta `src/app/inspecciones/page.tsx` correspondiente al listado de inspecciones de la Semana 04. La página utiliza un Server Component de Next.js y consume directamente los datos sintéticos definidos en `src/lib/data/inspections.ts`.
 
@@ -149,23 +154,4 @@ Las pruebas verifican principalmente la estructura del Service Worker y simulan 
 - **Contribución técnica:** Suites de pruebas automatizadas para Service Worker y contingencia offline (`tests/service-worker.spec.ts`, `tests/offline.spec.ts`).
 - **Pruebas ejecutadas:** `npm test`, `npm run build` y `npm run verify` con salida PASS en todas las suites.
 - **Limitación encontrada:** Las pruebas verifican principalmente la estructura del Service Worker y simulan una navegación sin red. No se realizó una auditoría completa de funcionamiento offline en un navegador real.
-- **Uso declarado de IA:** Apoyo con ChatGPT para el diseño de pruebas y simulación de contingencia offline; validado y verificado en el entorno local.
-
-
-----------------------------------
-
-# Evidencia Individual — Semana 05
-
-## Montalvo Osorio Alexis (3523110113)
-
-- **Commit SHA individual:** [AGREGAR SHA]
-
-- **Contribución técnica:** Implementación del esquema de persistencia local en `src/lib/storage/schema.ts` y de la política de resolución de conflictos en `src/lib/sync/conflict-policy.ts`.
-
-- **Decisión técnica:** Se definió un registro local de inspección con versión y fecha de actualización (`updatedAt`). Para resolver conflictos entre cambios de una misma inspección, la política compara primero la versión, después la fecha de actualización y, en caso de empate, utiliza una comparación determinista para evitar resultados diferentes ante los mismos datos.
-
-- **Prueba ejecutada y resultado:** Se ejecutó `npx tsc --noEmit` para comprobar la validación de tipos del proyecto. El comando terminó correctamente y no reportó errores.
-
-- **Limitación encontrada:** En esta etapa todavía no se implementa la cola de sincronización ni la persistencia real en IndexedDB. Esas funciones se integrarán con `src/lib/sync/queue.ts` y las pruebas correspondientes de la Semana 05.
-
-- **Uso declarado de IA:** Se utilizó ChatGPT como apoyo de pair programming para revisar la estructura del esquema, definir los tipos de los registros locales y diseñar la política de resolución de conflictos. Los cambios fueron revisados manualmente y validados mediante la compilación de TypeScript.
+- **Uso declarado de IA:** Apoyo con ChatGPT para el diseño de pruebas y simulación de contingencia offline; validado y verificado en el entorno local.

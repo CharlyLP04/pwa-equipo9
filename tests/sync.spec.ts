@@ -271,6 +271,101 @@ assert.equal(
   "Debe indicar que el conflicto se resolvió mediante updatedAt"
 );
 
+// Si versión y updatedAt empatan, aplica desempate determinista (deterministic-tie-break)
+const tieRecordA: LocalInspectionRecord = {
+  ...inspection,
+  version: 4,
+  updatedAt: "2026-10-04T12:00:00.000Z",
+  summary: "Variante A",
+};
+
+const tieRecordB: LocalInspectionRecord = {
+  ...inspection,
+  version: 4,
+  updatedAt: "2026-10-04T12:00:00.000Z",
+  summary: "Variante B",
+};
+
+const tieResolution = resolveConflict(tieRecordA, tieRecordB);
+assert.equal(
+  tieResolution.reason,
+  "deterministic-tie-break",
+  "En empate de versión y fecha debe aplicar desempate determinista"
+);
+
+// ============================================================
+// 6. Servidor idempotente, rechazo fuera de orden y resume tras cierre
+// ============================================================
+
+const sharedStorage = createMemoryStorage();
+const idempotentQueue = new SyncQueue({
+  storage: sharedStorage,
+  now: () => currentTime,
+  baseBackoffMs: 1000,
+  maxAttempts: 2,
+});
+
+const opResume = idempotentQueue.enqueue({
+  operationId: "operation-resume-001",
+  entityId: "insp-002",
+  type: "CREATE_INSPECTION",
+  payload: { ...inspection, id: "insp-002" },
+  revision: 2,
+});
+
+// Simulamos que la pestaña se cierra mientras la operación está inFlight
+idempotentQueue.markInFlight(opResume.operationId);
+assert.equal(
+  idempotentQueue.find(opResume.operationId)?.status,
+  "inFlight",
+  "La operación debe estar en inFlight antes del cierre simulado"
+);
+
+// Al reabrir la aplicación con el mismo almacenamiento, inFlight vuelve a pending
+const reloadedQueue = new SyncQueue({
+  storage: sharedStorage,
+  now: () => currentTime,
+  baseBackoffMs: 1000,
+  maxAttempts: 2,
+});
+
+assert.equal(
+  reloadedQueue.find(opResume.operationId)?.status,
+  "pending",
+  "Al reanudar la cola tras cierre de pestaña, inFlight debe volver a pending"
+);
+
+// Rechazo de ACK fuera de orden (revisión menor a la de la operación)
+const staleAckAccepted = reloadedQueue.acknowledge({
+  operationId: opResume.operationId,
+  serverId: "srv-stale",
+  revision: 1,
+});
+assert.equal(
+  staleAckAccepted,
+  false,
+  "Un ACK con revisión vieja (fuera de orden) debe ser rechazado"
+);
+assert.notEqual(
+  reloadedQueue.find(opResume.operationId)?.status,
+  "done",
+  "Una operación con ACK rechazado no debe marcarse como done"
+);
+
+// Confirmación con revisión válida y limpieza con dequeueDone()
+const validAckAccepted = reloadedQueue.acknowledge({
+  operationId: opResume.operationId,
+  serverId: "srv-valid",
+  revision: 2,
+});
+assert.equal(validAckAccepted, true, "El ACK con revisión vigente debe aceptarse");
+assert.equal(
+  reloadedQueue.dequeueDone(),
+  1,
+  "dequeueDone debe purgar las operaciones completadas"
+);
+assert.equal(reloadedQueue.size(), 0, "La cola debe quedar vacía tras dequeueDone");
+
 console.log("sync.spec.ts: PASS");
 }
 
