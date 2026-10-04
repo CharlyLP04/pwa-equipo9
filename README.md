@@ -216,3 +216,22 @@ Durante la Semana 04 se implementaron y compararon dos estrategias de renderizad
 
 ```bash
 npm ci
+
+## Semana 05 — Persistencia local y sincronización idempotente
+
+### Implementación
+
+Durante la Semana 05 se incorporó la capa de persistencia y sincronización offline-first para las inspecciones:
+
+- `src/lib/storage/schema.ts`: define y valida los registros locales y operaciones pendientes.
+- `src/lib/sync/queue.ts`: administra la cola de operaciones offline, reintentos e idempotencia.
+- `src/lib/sync/conflict-policy.ts`: resuelve conflictos entre versiones locales y remotas de forma determinista.
+- `docs/sync-policy.md`: documenta la estrategia y decisiones de sincronización.
+- `tests/sync.spec.ts`: valida automáticamente el esquema, la cola, los reintentos, la prevención de duplicados y la resolución de conflictos.
+
+### Pruebas automatizadas
+
+La suite de Semana 05 está integrada al comando general:
+
+```bash
+npm test
