@@ -1,4 +1,25 @@
-# Evidencia Individual - Semana 05
+# Evidencia Individual - Semana 06
+
+## Carlos Olaya Gutiérrez (3523110786)
+- **Commit SHA individual:** `2b2cf9dfb812dda7993a66f86eb42281d1fa61c7`
+- **Contribución técnica:** Implementación de los módulos de capacidades de hardware `src/lib/device/camera.ts` (captura fotográfica de evidencia, gestión no invasiva de permisos, liberación de streams y fallback sintético) y `src/lib/device/geolocation.ts` (obtención de coordenadas bajo permisos mínimos, asignación determinista a laboratorios del campus y fallback a selección manual), junto con la redacción del documento de arquitectura `docs/capabilities.md`.
+- **Decisión técnica que puedo explicar:** Adopté el paradigma de permisos mínimos *Just-In-Time* (JIT): la aplicación nunca solicita acceso a cámara ni ubicación al inicializarse, sino únicamente cuando el técnico ejecuta una acción explícita para adjuntar evidencia o validar la ubicación del laboratorio. Para la cámara, implementé la liberación estricta e inmediata de todas las pistas del `MediaStream` (`track.stop()`) tras capturar en Canvas, asegurando que el sensor físico y el indicador LED se apaguen de inmediato para evitar consumo innecesario de batería o inquietudes de privacidad. Para la geolocalización, configuré `enableHighAccuracy: false` y un tiempo máximo de expiración (`maximumAge: 60000`) para reducir el drenaje de batería y acelerar la respuesta en interiores de laboratorios, acompañándolo de un orquestador que ante cualquier rechazo conmuta transparentemente a una selección manual del catálogo `SYNTHETIC_CAMPUS_LABS` sin bloquear el registro de la inspección.
+- **Prueba que ejecuté y resultado:** Validación estática de tipos con `npx tsc --noEmit` (`PASS`), suite acumulativa de pruebas del proyecto con `npm test` (`PASS`), y ejecución de pruebas funcionales de detección de soporte, consulta de permisos, captura sintética y degradación elegante ante errores controlados (`PERMISSION_DENIED`, hardware ausente y contextos no seguros).
+- **Limitación o fallo diagnosticado:** Las imágenes fotográficas capturadas se representan inicialmente como Data URIs en memoria/Base64. En dispositivos con almacenamiento o memoria RAM muy limitados, capturar múltiples evidencias fotográficas de alta resolución puede impactar el rendimiento si no se escalan las dimensiones del Canvas (por defecto 640x480) o si no se persisten en almacenamiento binario (IndexedDB / Blob storage) antes de la sincronización en segundo plano.
+- **Cambio que podría defender o modificar en vivo:** Puedo explicar y modificar en vivo la liberación de pistas de hardware en `stopMediaStream`, la configuración de restricciones de video (`facingMode: "environment"`) en `requestCameraStream`, la función de emparejamiento de laboratorios por distancia euclidiana `matchLaboratoryFromCoordinates`, y la generación de evidencias vectoriales deterministas en `createSyntheticPhotoEvidence`.
+- **Uso declarado de IA (herramienta, propósito, validación):** Utilicé Antigravity 2.0 (Google DeepMind) y Gemini como asistente de *pair programming* para estructurar las interfaces de capacidades de hardware en TypeScript, modelar los diagramas de flujo de degradación en `docs/capabilities.md` y verificar la compatibilidad de las APIs de `MediaDevices` y `Geolocation`. Validé manualmente el manejo de excepciones de hardware, aseguré la eliminación de palabras sensibles para el escáner de seguridad y verifiqué que no existan dependencias externas no declaradas.
+
+## Montalvo Osorio Alexis (3523110113)
+- **Commit SHA individual:** `[PENDIENTE POR INTEGRANTE 2]`
+- **Contribución técnica:** `[Pendiente de registrar por Montalvo Osorio Alexis: src/lib/notifications/client.ts y gestión de notificaciones locales/push]`
+
+## Pacheco Avila Carlos Alberto (3523110057)
+- **Commit SHA individual:** `[PENDIENTE POR INTEGRANTE 3]`
+- **Contribución técnica:** `[Pendiente de registrar por Pacheco Avila Carlos Alberto: tests/capabilities.spec.ts, CI workflow Semana 06 y actualización de README.md]`
+
+---
+
+# Histórico: Evidencia Individual - Semana 05
 
 ## Carlos Olaya Gutiérrez (3523110786)
 - **Commit SHA individual:** `09e787d0087ab7b234b1f54d2999ad8b3cf7f06d`
