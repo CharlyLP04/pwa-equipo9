@@ -88,7 +88,7 @@ El sistema deberá permitir capturar una inspección cuando no exista conexión 
     *   El comando `npm test` debe validar correctamente los artefactos base y la presencia de la estructura sintética requerida.
     *   El comando `npm run build` debe generar el build de producción de Next.js de manera exitosa y sin advertencias bloqueantes.
     *   Los archivos `docs/requirements.md` y `docs/decision-record.md` deben estar completamente diligenciados sin textos guía ni marcadores de posición.
-=======
+
 * **RNF-01 — Reproducibilidad:** El proyecto deberá poder instalar todas sus dependencias utilizando `npm ci` a partir del archivo `package-lock.json`, sin requerir modificaciones manuales.
 
   * **Cómo se comprobará:** Ejecutando `npm ci` desde una instalación limpia.
