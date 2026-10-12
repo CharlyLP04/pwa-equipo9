@@ -1,4 +1,28 @@
 
+# Evidencia Individual — Semana 06
+
+## Pacheco Avila Carlos Alberto (3523110057)
+
+- **Rol:** Pruebas automatizadas, integración continua (CI) y documentación.
+
+- **Commit SHA individual:** Pendiente de registrar después del commit principal.
+
+- **Contribución técnica:** Implementé la suite automatizada `tests/capabilities.spec.ts`, que contiene nueve escenarios para validar las capacidades del dispositivo: cámara, geolocalización y notificaciones. Integré las pruebas al comando `npm test` mediante `package.json`, incorporé el workflow oficial `.github/workflows/week-06-w06-device-push.yml` y actualicé `README.md` con las instrucciones de ejecución, verificación y limitaciones.
+
+- **Decisión técnica que puedo explicar:** Utilicé mocks deterministas para simular las APIs del navegador sin depender de dispositivos físicos, permisos reales ni servicios externos. Las pruebas verifican los permisos concedidos y denegados de cámara, la ausencia de soporte, la geolocalización exitosa, los errores por tiempo de espera y el uso de ubicaciones sintéticas como alternativa. También validan los estados `granted`, `denied` y `default` de las notificaciones y la emisión de eventos de contingencia con roles accesibles `alert` y `status`.
+
+- **Pruebas ejecutadas y resultados:** Ejecuté `npx.cmd tsx tests/capabilities.spec.ts`, obteniendo PASS en los nueve escenarios. También ejecuté `npm.cmd test`, `npm.cmd run test -- --run`, `npm.cmd run build` y `npm.cmd run verify`, con resultados satisfactorios. La compilación de producción se completó correctamente y todas las suites automatizadas finalizaron con PASS.
+
+- **Limitación o fallo diagnosticado:** Las pruebas utilizan simulaciones controladas de las APIs nativas, por lo que no sustituyen las pruebas manuales en navegadores y dispositivos reales. Además, comprobar la emisión de un evento accesible de notificación no garantiza por sí solo que el mensaje se visualice correctamente en la interfaz.
+
+- **Cambio que podría defender o modificar en vivo:** Puedo modificar los mocks para simular una cámara sin permisos, una geolocalización que excede el tiempo de espera o notificaciones bloqueadas. También puedo explicar cómo las aserciones verifican el comportamiento esperado y permiten detectar regresiones.
+
+- **Uso declarado de IA:** Utilicé ChatGPT como herramienta de apoyo para diseñar los escenarios de prueba, estructurar los mocks, integrar las pruebas automatizadas y redactar la documentación técnica. Revisé los cambios y comprobé su funcionamiento mediante la ejecución de las pruebas, la compilación y la verificación local.
+
+---
+
+
+
 # Evidencia Individual - Semana 05
 
 ## Carlos Olaya Gutiérrez (3523110786)

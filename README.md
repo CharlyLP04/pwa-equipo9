@@ -260,4 +260,108 @@ bash public-tests/check.sh
 
 - **Política de sincronización y conflictos:** [`docs/sync-policy.md`](./docs/sync-policy.md)
 - **Evidencia individual del equipo (Semanas 01–05):** [`evidence/individual.md`](./evidence/individual.md)
-- **Workflow CI Semana 05:** [`.github/workflows/week-05-w05-sync-data.yml`](./.github/workflows/week-05-w05-sync-data.yml)
+- **Workflow CI Semana 05:** [`.github/workflows/week-05-w05-sync-data.yml`](./.github/workflows/week-05-w05-sync-data.yml)
+
+
+---
+
+## Semana 06 — Capacidades del dispositivo y notificaciones
+
+### Implementación
+
+Se incorporaron capacidades del dispositivo a la PWA de inspecciones de laboratorio, utilizando exclusivamente datos sintéticos y permisos mínimos.
+
+- `src/lib/device/camera.ts`: gestiona el acceso a la cámara, permisos, captura de evidencia y contingencia cuando la API no está disponible o el acceso es denegado.
+- `src/lib/device/geolocation.ts`: obtiene coordenadas, identifica laboratorios sintéticos y permite continuar mediante una ubicación de contingencia o selección manual.
+- `src/lib/notifications/client.ts`: gestiona los permisos `granted`, `denied` y `default`, despacha notificaciones mediante la API nativa o Service Worker y emite eventos para avisos accesibles dentro de la aplicación.
+- `docs/capabilities.md`: documenta decisiones, privacidad, limitaciones y mecanismos de contingencia.
+
+### Pruebas automatizadas
+
+Se incorporó `tests/capabilities.spec.ts` con nueve escenarios reproducibles mediante mocks deterministas:
+
+1. Cámara con permiso concedido.
+2. Cámara con permiso denegado.
+3. Cámara sin soporte del navegador.
+4. Geolocalización exitosa.
+5. Geolocalización con timeout.
+6. Geolocalización con fallback a laboratorio seleccionado.
+7. Notificaciones con permiso granted.
+8. Notificaciones con permiso denied y evento accesible de alerta.
+9. Notificaciones con permiso default y evento accesible de estado.
+
+Las pruebas no requieren cámara física, GPS, permisos reales ni servicios externos.
+
+### Instalación, ejecución y verificación
+
+```bash
+npm ci
+npm test
+npm run test -- --run
+npm run build
+npm run verify
+```
+
+En Windows PowerShell se utiliza `npm.cmd` en lugar de `npm` cuando la ejecución de scripts de PowerShell está restringida.
+
+Para ejecutar únicamente las pruebas de Semana 06:
+
+```bash
+npx tsx tests/capabilities.spec.ts
+```
+
+### Resultados locales
+
+- `npm test`: PASS, incluyendo los nueve escenarios de Semana 06.
+- `npm run test -- --run`: PASS.
+- `npm run build`: PASS.
+- `npm run verify`: PASS.
+- Reporte local: `reports/verification.json`.
+
+### Integración continua
+
+Workflow oficial de Semana 06:
+
+`.github/workflows/week-06-w06-device-push.yml`
+
+GitHub Actions ejecuta la instalación limpia, compilación, comprobación de artefactos y suite automatizada de pruebas.
+
+### Supuestos y limitaciones
+
+Las APIs de cámara, ubicación y notificaciones dependen del navegador, del contexto seguro y de los permisos concedidos por el usuario. Los mocks permiten comprobar los contratos y las rutas de error sin depender de hardware.
+
+Las pruebas del evento de fallback de notificaciones comprueban su emisión y su semántica accesible (`alert` o `status`), pero no sustituyen una prueba visual o end-to-end del banner en un navegador real.
+
+Las coordenadas y evidencias utilizadas en las pruebas son sintéticas; no se recopilan datos personales ni ubicaciones reales.
+```
+
+**Importante:** cuando lo pegues, conserva los bloques de código Markdown tal como aparecen.
+
+Guarda el archivo con `Ctrl + S`.
+
+### Paso 13. Preparar la evidencia individual
+
+Abre:
+
+```powershell
+code evidence/individual.md
+```
+
+En la primera línea del archivo, antes de `# Evidencia Individual - Semana 05`, agrega lo siguiente:
+
+<CodeBlock language="markdown" editable>
+# Evidencia Individual — Semana 06
+
+## Pacheco Avila Carlos Alberto (3523110057)
+
+- **Commit SHA individual:** Pendiente de registrar después del commit principal.
+- **Contribución técnica:** Implementación de `tests/capabilities.spec.ts` con nueve escenarios automatizados para cámara, geolocalización y notificaciones. Integración de la suite en `npm test` mediante `package.json`, incorporación del workflow oficial `.github/workflows/week-06-w06-device-push.yml` y actualización de la documentación en `README.md`.
+- **Decisión técnica que puedo explicar:** Utilicé mocks deterministas para simular las APIs nativas del navegador sin depender de dispositivos físicos ni permisos reales. Las pruebas comprueban los estados de cámara, el manejo de timeout de geolocalización y la recuperación mediante laboratorio sintético seleccionado. Para notificaciones, validan los estados `granted`, `denied` y `default`, así como la emisión del evento `utt:notification-fallback` con roles accesibles `alert` y `status`.
+- **Pruebas ejecutadas y resultados:** Ejecuté `npx.cmd tsx tests/capabilities.spec.ts` y obtuve PASS en nueve escenarios. También ejecuté `npm.cmd test`, `npm.cmd run test -- --run`, `npm.cmd run build` y `npm.cmd run verify`, todos con resultado PASS.
+- **Limitación o fallo diagnosticado:** Los mocks permiten validar la lógica de permisos y los mecanismos de contingencia, pero no sustituyen pruebas end-to-end en un navegador real. La emisión del evento accesible no demuestra por sí sola que el banner se renderice correctamente en pantalla.
+- **Cambio que podría defender o modificar en vivo:** Puedo modificar los mocks para simular la denegación de cámara, un timeout de geolocalización o un permiso de notificaciones bloqueado, y explicar cómo las aserciones detectan regresiones en el comportamiento esperado.
+- **Uso declarado de IA:** Utilicé ChatGPT como apoyo para diseñar los escenarios de prueba, estructurar los mocks de APIs nativas, integrar la suite al proyecto y redactar la documentación. Revisé el código y validé los resultados ejecutando las pruebas, la compilación y la verificación local.
+
+---
+
+# Histórico: Evidencia Individual — Semana 05
