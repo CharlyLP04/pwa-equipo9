@@ -154,4 +154,23 @@ Las pruebas verifican principalmente la estructura del Service Worker y simulan 
 - **Contribución técnica:** Suites de pruebas automatizadas para Service Worker y contingencia offline (`tests/service-worker.spec.ts`, `tests/offline.spec.ts`).
 - **Pruebas ejecutadas:** `npm test`, `npm run build` y `npm run verify` con salida PASS en todas las suites.
 - **Limitación encontrada:** Las pruebas verifican principalmente la estructura del Service Worker y simulan una navegación sin red. No se realizó una auditoría completa de funcionamiento offline en un navegador real.
-- **Uso declarado de IA:** Apoyo con ChatGPT para el diseño de pruebas y simulación de contingencia offline; validado y verificado en el entorno local.
+- **Uso declarado de IA:** Apoyo con ChatGPT para el diseño de pruebas y simulación de contingencia offline; validado y verificado en el entorno local.
+
+-------------------------------------
+# Evidencia Individual - Semana 06
+
+## Montalvo Osorio Alexis (3523110113)
+
+- **Commit SHA individual:** `d46322444b714b1fc6ae5ea7cbc063865e3638c5`
+
+- **Contribución técnica:** Implementación del cliente de notificaciones en `src/lib/notifications/client.ts`, integración del botón de activación y los avisos de respaldo accesibles en `src/components/app-shell.tsx`, y ajustes visuales en `src/app/globals.css`.
+
+- **Decisión técnica que puedo explicar:** Se implementó la gestión de los permisos `default`, `granted` y `denied`, solicitando autorización únicamente después de una acción explícita del usuario. El cliente intenta entregar notificaciones mediante `ServiceWorkerRegistration.showNotification()` cuando existe un registro disponible y utiliza la API nativa `Notification` como alternativa. Cuando las notificaciones no están disponibles o falla su entrega, se emite un evento que permite mostrar un aviso accesible dentro de la aplicación. También se eliminaron las referencias al icono de notificación inexistente.
+
+- **Prueba que ejecuté y resultado:** Se ejecutaron `npm run build`, `npm test`, `npm run verify` y `git diff --check`, con resultado PASS según las verificaciones realizadas. En la prueba manual se comprobó que, al bloquear las notificaciones del sistema, la aplicación muestra el aviso de respaldo. También se verificó que Chrome devuelve `granted` para `Notification.permission`; sin embargo, no se consiguió confirmar la visualización de la notificación del sistema.
+
+- **Limitación o fallo diagnosticado:** La visualización de las notificaciones del sistema continúa pendiente de diagnóstico, aunque el permiso de Chrome aparece como concedido y las opciones de notificación de Windows están activadas. El mecanismo de respaldo sí se comprobó visualmente. La implementación actual cubre notificaciones locales y no incluye la infraestructura necesaria para confirmar el envío de notificaciones push remotas en segundo plano.
+
+- **Cambio que podría defender o modificar en vivo:** Puedo explicar y modificar la gestión de permisos en `requestNotificationPermission()`, el despacho mediante `dispatchLocalNotification()`, la selección entre Service Worker y API nativa, el manejo de errores y la emisión del evento `NOTIFICATION_FALLBACK_EVENT`.
+
+- **Uso declarado de IA (herramienta, propósito, validación):** Utilicé ChatGPT y Codex como apoyo para revisar, implementar y corregir el cliente de notificaciones, integrarlo con la interfaz y analizar los problemas de entrega. Validé los cambios mediante compilación, pruebas automatizadas, verificación del proyecto y comprobaciones manuales en Chrome y Windows. La entrega visual de la notificación del sistema permanece pendiente, sin declararla como prueba exitosa.
