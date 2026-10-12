@@ -5,7 +5,7 @@
  * - Permisos solicitados únicamente tras una acción explícita del usuario.
  * - Notificaciones mediante Notification o ServiceWorkerRegistration.
  * - Fallback accesible mediante un evento consumido por la interfaz.
- * - Sin secretos ni datos personales reales.
+ * - Sin datos confidenciales ni datos personales reales.
  */
 
 export type NotificationPermissionState =
