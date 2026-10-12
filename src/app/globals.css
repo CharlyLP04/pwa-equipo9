@@ -114,6 +114,40 @@ body {
   gap: 10px;
 }
 
+.notification-enable-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid #3156d3;
+  border-radius: 8px;
+  background: #3156d3;
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.notification-enable-button:hover {
+  background: #2445b5;
+  border-color: #2445b5;
+}
+
+.notification-enable-button:focus-visible {
+  outline: 3px solid #3156d3;
+  outline-offset: 3px;
+}
+
+.notification-enable-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .pwa-status-pill {
   display: inline-flex;
   align-items: center;
@@ -746,4 +780,74 @@ dd {
   .header-content {
     padding: 10px 16px;
   }
+}
+
+.notification-fallback-banner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1rem;
+  padding: 1rem 1.125rem;
+  border: 1px solid #b6c5e6;
+  border-radius: 12px;
+  background: #f1f5ff;
+  color: #1e293b;
+}
+
+.notification-fallback-banner[role="alert"] {
+  border-color: #fca5a5;
+  background: var(--danger-soft);
+}
+
+.notification-fallback-content {
+  min-width: 0;
+}
+
+.notification-fallback-title {
+  margin: 0 0 0.35rem;
+  font-weight: 700;
+}
+
+.notification-fallback-message {
+  margin: 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.notification-fallback-dismiss {
+  flex-shrink: 0;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid #94a3b8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1e293b;
+  font: inherit;
+  cursor: pointer;
+}
+
+.notification-fallback-dismiss:focus-visible {
+  outline: 3px solid #3156d3;
+  outline-offset: 3px;
+}
+
+.notification-fallback-dismiss:hover {
+  background: var(--surface-subtle);
+}
+
+@media (max-width: 480px) {
+  .notification-fallback-banner {
+    gap: 0.75rem;
+    padding: 0.85rem;
+  }
+}
+
+.header-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.notification-enable-button {
+  max-width: 100%;
+  white-space: normal;
 }

@@ -1,7 +1,13 @@
 "use client";
 
-import React, { ReactNode, useEffect } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { registerServiceWorker } from "@/lib/pwa/register-service-worker";
+import {
+  NOTIFICATION_FALLBACK_EVENT,
+  requestNotificationPermission,
+  dispatchLocalNotification,
+  type NotificationFallbackDetail,
+} from "@/lib/notifications/client";
 
 export interface AppShellProps {
   children?: ReactNode;
@@ -162,8 +168,69 @@ export function AppShell({
   useEffect(() => {
     registerServiceWorker();
   }, []);
-  
-   const navItems = [
+
+  const [notificationFallback, setNotificationFallback] =
+    useState<NotificationFallbackDetail | null>(null);
+  const [isRequestingNotifications, setIsRequestingNotifications] =
+    useState(false);
+
+  useEffect(() => {
+    const handleNotificationFallback = (event: Event) => {
+      const customEvent =
+        event as CustomEvent<NotificationFallbackDetail>;
+
+      if (customEvent.detail) {
+        setNotificationFallback(customEvent.detail);
+      }
+    };
+
+    window.addEventListener(
+      NOTIFICATION_FALLBACK_EVENT,
+      handleNotificationFallback
+    );
+
+    return () => {
+      window.removeEventListener(
+        NOTIFICATION_FALLBACK_EVENT,
+        handleNotificationFallback
+      );
+    };
+  }, []);
+
+  const handleNotificationActivation = async () => {
+    setNotificationFallback(null);
+    setIsRequestingNotifications(true);
+
+    try {
+      const permission = await requestNotificationPermission();
+
+      if (permission === "granted") {
+        await dispatchLocalNotification({
+          kind: "general",
+          title: "Notificaciones activadas",
+          body: "Las notificaciones del laboratorio están habilitadas.",
+          tag: "utt-notifications-enabled"
+        });
+      }
+    } catch (error) {
+      console.error(
+        "[Notificaciones] Falló la activación desde la interfaz:",
+        error
+      );
+      setNotificationFallback({
+        title: "No fue posible activar las notificaciones",
+        message:
+          "No se pudo completar la solicitud. Inténtalo de nuevo o revisa los permisos del sitio.",
+        reason: "delivery-failed",
+        kind: "general",
+        role: "alert"
+      });
+    } finally {
+      setIsRequestingNotifications(false);
+    }
+  };
+
+  const navItems = [
     {
       id: "inspecciones",
       label: "Inspecciones",
@@ -226,6 +293,18 @@ export function AppShell({
               <span className="status-dot" aria-hidden="true" />
               {statusBadge}
             </span>
+
+            <button
+              type="button"
+              className="notification-enable-button"
+              onClick={handleNotificationActivation}
+              disabled={isRequestingNotifications}
+              aria-busy={isRequestingNotifications}
+            >
+              {isRequestingNotifications
+                ? "Activando notificaciones..."
+                : "Activar notificaciones"}
+            </button>
           </div>
         </div>
       </header>
@@ -259,6 +338,37 @@ export function AppShell({
 
         {/* 3. Contenedor de contenido principal */}
         <main id="main-content" className="app-main" role="main" tabIndex={-1}>
+          {notificationFallback && (
+            <aside
+              className="notification-fallback-banner"
+              role={notificationFallback.role}
+              aria-live={
+                notificationFallback.role === "alert"
+                  ? "assertive"
+                  : "polite"
+              }
+              aria-atomic="true"
+            >
+              <div className="notification-fallback-content">
+                <p className="notification-fallback-title">
+                  {notificationFallback.title}
+                </p>
+
+                <p className="notification-fallback-message">
+                  {notificationFallback.message}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="notification-fallback-dismiss"
+                aria-label="Cerrar aviso de notificaciones"
+                onClick={() => setNotificationFallback(null)}
+              >
+                Cerrar
+              </button>
+            </aside>
+          )}
           {children}
         </main>
       </div>
