@@ -26,6 +26,11 @@ const required = [
   "src/lib/sync/conflict-policy.ts",
   "docs/sync-policy.md",
   "tests/sync.spec.ts",
+  "src/lib/device/camera.ts",
+  "src/lib/device/geolocation.ts",
+  "src/lib/notifications/client.ts",
+  "docs/capabilities.md",
+  "tests/capabilities.spec.ts",
   "evidence/individual.md"
 ];
 
