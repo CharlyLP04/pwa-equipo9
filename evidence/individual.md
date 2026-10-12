@@ -5,7 +5,7 @@
 
 - **Rol:** Pruebas automatizadas, integración continua (CI) y documentación.
 
-- **Commit SHA individual:** Pendiente de registrar después del commit principal.
+- **Commit SHA individual:** `24891f42de4df3b4a2dc5f53c309f7fec11eb639`
 
 - **Contribución técnica:** Implementé la suite automatizada `tests/capabilities.spec.ts`, que contiene nueve escenarios para validar las capacidades del dispositivo: cámara, geolocalización y notificaciones. Integré las pruebas al comando `npm test` mediante `package.json`, incorporé el workflow oficial `.github/workflows/week-06-w06-device-push.yml` y actualicé `README.md` con las instrucciones de ejecución, verificación y limitaciones.
 
