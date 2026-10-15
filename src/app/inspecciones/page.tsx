@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { inspections } from "@/lib/data/inspections";
 import { AppShell } from "@/components/app-shell";
+import { InspectionSyncManager } from "@/components/inspection-sync-manager";
 
 export default function InspeccionesPage() {
   return (
@@ -12,24 +13,26 @@ export default function InspeccionesPage() {
       <div className="normal-content-view">
         <header className="hero">
           <p className="eyebrow">
-            Universidad Tecnológica de Tehuacán · Semana 04
+            Universidad Tecnológica de Tehuacán · Mantenimiento Preventivo
           </p>
 
           <h1>Inspecciones de laboratorio</h1>
 
           <p className="lead">
-            Registro de inspecciones de laboratorio renderizado mediante
-            Server Component. Los datos mostrados en este sistema son
-            sintéticos.
+            Registro y captura de inspecciones de laboratorio con soporte Offline-First,
+            sincronización idempotente y capacidades de dispositivo integradas.
           </p>
 
           <div className="hero-tags">
-            <span className="status">Renderizado: SSR</span>
+            <span className="status">Renderizado: SSR + Hidratación CSR</span>
             <span className="status status-accent">
-              Datos: locales y sintéticos
+              Persistencia: Offline-First + Outbox
             </span>
           </div>
         </header>
+
+        {/* Panel interactivo de captura en campo, capacidades de hardware y sincronización */}
+        <InspectionSyncManager />
 
         <section
           aria-labelledby="inspections-heading"
@@ -37,8 +40,8 @@ export default function InspeccionesPage() {
         >
           <div className="section-heading">
             <div>
-              <p className="eyebrow">Datos sintéticos de demostración</p>
-              <h2 id="inspections-heading">Inspecciones recientes</h2>
+              <p className="eyebrow">Catálogo del servidor / datos sintéticos</p>
+              <h2 id="inspections-heading">Inspecciones del servidor</h2>
             </div>
 
             <span className="count">{inspections.length} registros</span>

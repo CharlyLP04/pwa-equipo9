@@ -24,9 +24,10 @@ UI (formulario)  →  Storage (schema.ts)  →  Outbox (queue.ts)  →  Sync (pr
                                      conflict-policy.ts (reconcile)
 ```
 
-- La UI **nunca** llama a la red para guardar: escribe en almacenamiento local y encola.
-- `src/lib/storage/schema.ts` define `inspections`, `outbox` y `sync_meta`.
-- `src/lib/sync/queue.ts` gestiona el ciclo de vida de cada operación.
+- La UI integra el componente interactivo `src/components/inspection-sync-manager.tsx` montado en `src/app/inspecciones/page.tsx`: el formulario de captura escribe en almacenamiento local (`localStorage`) y encola en `SyncQueue`.
+- Detecta conectividad en tiempo real mediante `navigator.onLine` y eventos `window.addEventListener('online')`/`offline`, ejecutando la sincronización automática de la outbox al recuperar conexión.
+- `src/lib/storage/schema.ts` define `isLocalInspectionRecord`, `LocalInspectionRecord` y esquemas de validación.
+- `src/lib/sync/queue.ts` gestiona el ciclo de vida de cada operación y provee `createIdempotentServer({ deduplicationEnabled })`.
 - `src/lib/sync/conflict-policy.ts` decide qué hacer ante revisiones incompatibles.
 
 ## 3. Ciclo de sincronización (determinista)
@@ -90,12 +91,13 @@ Un conflicto ocurre cuando el cliente tiene `rev 7` y el servidor ya tiene `rev 
 | Caso | Qué demuestra | Resultado esperado |
 |---|---|---|
 | offline capture | guardar sin red y recargar | la operación sigue `pending` tras crear una nueva instancia de la cola |
-| retry duplicate | mismo `operationId` varias veces + timeout tras escritura | el servidor simulado registra **1** elemento |
+| retry duplicate | mismo `operationId` varias veces + timeout tras escritura | el servidor simulado registra **1** elemento con `duplicate: true` |
+| server dedup sabotage | simular servidor con deduplicación desactivada (`deduplicationEnabled: false`) | la suite detecta la regresión y alerta de registros espurios |
 | conflict case | `rev 7` vs `rev 8` | se resuelve según la política, sin perder datos en silencio |
 | out-of-order | ACK `rev 7` después de `rev 8` | el ACK viejo se descarta |
 | resume queue | recargar con operación `inFlight` | vuelve a `pending` y se completa después |
 
-Las pruebas usan `createMemoryStorage()` y `createIdempotentServer()`: no dependen de red pública ni de servicios privados.
+Las pruebas usan `createMemoryStorage()` y `createIdempotentServer({ deduplicationEnabled })`: no dependen de red pública ni de servicios privados.
 
 ## 9. Supuestos y límites
 

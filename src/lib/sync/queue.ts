@@ -416,27 +416,65 @@ export class SyncQueue {
   }
 }
 
+export interface IdempotentServerOptions {
+  deduplicationEnabled?: boolean;
+}
+
 /**
  * Simulador de servidor idempotente para pruebas sin red pública.
  * Guarda las idempotencyKey procesadas: un reintento devuelve el mismo
- * serverId y NO crea un segundo registro.
+ * serverId y NO crea un segundo registro cuando deduplicationEnabled es true.
+ * Si deduplicationEnabled es false (simulación de fallo/sabotaje del servidor),
+ * procesa cada reintento como un registro nuevo, permitiendo a las pruebas detectar
+ * dicha regresión.
  */
-export function createIdempotentServer() {
+export function createIdempotentServer(options: IdempotentServerOptions = {}) {
+  const deduplicationEnabled = options.deduplicationEnabled ?? true;
   const records: Record<string, { serverId: string; revision: number }> = {};
+  const allSubmissions: Array<{ serverId: string; idempotencyKey: string; revision: number }> = [];
   let counter = 0;
+  let duplicatesRejected = 0;
+
   return {
     handle(operation: OutboxOperation): SyncAck {
-      const existing = records[operation.idempotencyKey];
-      if (existing) {
-        return { operationId: operation.operationId, serverId: existing.serverId, revision: existing.revision, duplicate: true };
+      if (deduplicationEnabled && records[operation.idempotencyKey]) {
+        duplicatesRejected += 1;
+        const existing = records[operation.idempotencyKey];
+        return {
+          operationId: operation.operationId,
+          serverId: existing.serverId,
+          revision: existing.revision,
+          duplicate: true,
+        };
       }
       counter += 1;
       const record = { serverId: "srv-" + counter, revision: operation.revision };
-      records[operation.idempotencyKey] = record;
-      return { operationId: operation.operationId, serverId: record.serverId, revision: record.revision, duplicate: false };
+      if (deduplicationEnabled) {
+        records[operation.idempotencyKey] = record;
+      }
+      allSubmissions.push({
+        serverId: record.serverId,
+        idempotencyKey: operation.idempotencyKey,
+        revision: operation.revision,
+      });
+      return {
+        operationId: operation.operationId,
+        serverId: record.serverId,
+        revision: record.revision,
+        duplicate: false,
+      };
     },
     count(): number {
       return Object.keys(records).length;
-    }
+    },
+    totalSubmissions(): number {
+      return allSubmissions.length;
+    },
+    duplicateCount(): number {
+      return duplicatesRejected;
+    },
+    isDeduplicationEnabled(): boolean {
+      return deduplicationEnabled;
+    },
   };
 }

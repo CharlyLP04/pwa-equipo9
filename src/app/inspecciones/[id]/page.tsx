@@ -39,7 +39,16 @@ export default function InspeccionDetallePage() {
   useEffect(() => {
     // Simulación de carga asíncrona de cliente para evidenciar el estado de transición
     const timer = setTimeout(() => {
-      const found = inspections.find((item) => item.id.toLowerCase() === id.toLowerCase());
+      let found = inspections.find((item) => item.id.toLowerCase() === id.toLowerCase());
+      if (!found && typeof window !== "undefined") {
+        try {
+          const raw = window.localStorage.getItem("utt-local-inspections");
+          if (raw) {
+            const localList: Inspection[] = JSON.parse(raw);
+            found = localList.find((item) => item.id.toLowerCase() === id.toLowerCase());
+          }
+        } catch {}
+      }
       setInspection(found || null);
       setIsLoading(false);
     }, 450);
