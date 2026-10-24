@@ -38,6 +38,18 @@ assert.match(
   "El listado debe incluir enlaces hacia /inspecciones/[id]"
 );
 
+// Debe integrar el gestor interactivo de sincronización y captura offline.
+const syncManagerPath = resolve(root, "src/components/inspection-sync-manager.tsx");
+assert.ok(
+  existsSync(syncManagerPath),
+  "Debe existir el componente src/components/inspection-sync-manager.tsx"
+);
+assert.match(
+  listPage,
+  /<InspectionSyncManager\b/,
+  "El listado debe integrar InspectionSyncManager para captura y sincronización offline"
+);
+
 // 3. El detalle debe implementarse mediante CSR.
 assert.match(
   detailPage,

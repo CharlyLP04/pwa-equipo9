@@ -9,6 +9,7 @@ import {
 import {
   SyncQueue,
   createMemoryStorage,
+  createIdempotentServer,
 } from "../src/lib/sync/queue";
 
 import {
@@ -123,6 +124,63 @@ assert.equal(
   duplicateOperation.operationId,
   operation.operationId,
   "Debe conservarse la misma operación lógica"
+);
+
+// ============================================================
+// 3.1 Servidor idempotente: deduplicación activa vs. detección de sabotaje
+// ============================================================
+
+// Caso A: Servidor con deduplicación activa (comportamiento esperado)
+const serverWithDedup = createIdempotentServer({ deduplicationEnabled: true });
+const ackA1 = serverWithDedup.handle(operation);
+
+assert.equal(ackA1.duplicate, false, "El primer envío no debe ser duplicado");
+assert.equal(serverWithDedup.count(), 1, "Debe registrarse 1 clave en el servidor");
+assert.equal(serverWithDedup.totalSubmissions(), 1, "Debe registrarse 1 envío procesado");
+
+// Reintento con la misma operación lógica (idempotencyKey idéntica)
+const ackA2 = serverWithDedup.handle(operation);
+
+assert.equal(
+  ackA2.duplicate,
+  true,
+  "El servidor debe reconocer el reintento como duplicado por idempotencyKey"
+);
+assert.equal(
+  ackA2.serverId,
+  ackA1.serverId,
+  "Debe devolver exactamente el mismo serverId original"
+);
+assert.equal(
+  serverWithDedup.count(),
+  1,
+  "La deduplicación del servidor no debe crear un segundo registro"
+);
+assert.equal(
+  serverWithDedup.duplicateCount(),
+  1,
+  "Debe contabilizarse el duplicado interceptado en el servidor"
+);
+
+// Caso B: Detección de regresión si se desactiva la deduplicación del servidor (prueba de sabotaje)
+const serverBrokenDedup = createIdempotentServer({ deduplicationEnabled: false });
+const ackB1 = serverBrokenDedup.handle(operation);
+const ackB2 = serverBrokenDedup.handle(operation);
+
+assert.equal(
+  ackB2.duplicate,
+  false,
+  "Al desactivar deduplicación, el servidor falla en marcar duplicate: true"
+);
+assert.notEqual(
+  ackB1.serverId,
+  ackB2.serverId,
+  "Al desactivar deduplicación, el servidor asigna erróneamente un nuevo serverId"
+);
+assert.equal(
+  serverBrokenDedup.totalSubmissions(),
+  2,
+  "La suite detecta la anomalía: se crearon múltiples registros al desactivar deduplicación"
 );
 
 // ============================================================

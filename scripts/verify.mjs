@@ -21,6 +21,7 @@ const required = [
   "public/offline.html",
   "src/app/inspecciones/page.tsx",
   "src/app/inspecciones/[id]/page.tsx",
+  "src/components/inspection-sync-manager.tsx",
   "src/lib/sync/queue.ts",
   "src/lib/storage/schema.ts",
   "src/lib/sync/conflict-policy.ts",
