@@ -1,57 +1,20 @@
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-
-const root = resolve(import.meta.dirname, "..");
-const required = [
-  "package.json",
-  "package-lock.json",
-  "src/app/layout.tsx",
-  "src/app/page.tsx",
-  "src/app/globals.css",
-  "src/lib/data/inspections.ts",
-  "docs/requirements.md",
-  "docs/decision-record.md",
-  "tests/starter.spec.mjs",
-  "public/manifest.webmanifest",
-  "src/components/app-shell.tsx",
-  "tests/manifest.spec.ts",
-  "public/icons/icon-192x192.png",
-  "public/icons/icon-512x512.png",
-  "public/sw.js",
-  "public/offline.html",
-  "src/app/inspecciones/page.tsx",
-  "src/app/inspecciones/[id]/page.tsx",
-  "src/components/inspection-sync-manager.tsx",
-  "src/lib/sync/queue.ts",
-  "src/lib/storage/schema.ts",
-  "src/lib/sync/conflict-policy.ts",
-  "docs/sync-policy.md",
-  "tests/sync.spec.ts",
-  "src/lib/device/camera.ts",
-  "src/lib/device/geolocation.ts",
-  "src/lib/notifications/client.ts",
-  "docs/capabilities.md",
-  "tests/capabilities.spec.ts",
-  "evidence/individual.md"
-];
-
-const missing = required.filter((file) => !existsSync(resolve(root, file)));
-const result = {
-  schemaVersion: 1,
-  checkedAt: new Date().toISOString(),
-  status: missing.length === 0 ? "pass" : "fail",
-  missing
-};
-
-const report = resolve(root, "reports/verification.json");
-mkdirSync(dirname(report), { recursive: true });
-writeFileSync(report, `${JSON.stringify(result, null, 2)}\n`);
-
-if (missing.length > 0) {
-  console.error(`Faltan ${missing.length} artefactos: ${missing.join(", ")}`);
-  process.exit(1);
+import { spawnSync } from 'node:child_process';
+import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+const root = resolve(import.meta.dirname, '..');
+const required = ['tests/unit/schema.spec.ts', 'tests/unit/conflict-policy.spec.ts', 'tests/unit/device-helpers.spec.ts', 'tests/integration/sync-queue.spec.ts', 'tests/integration/server-dedup.spec.ts', 'tests/e2e/critical-path.spec.ts', 'docs/test-strategy.md', '.github/workflows/academic-evaluation.yml', 'evidence/individual.md'];
+const missing = required.filter(f => !existsSync(resolve(root, f)));
+const steps = [];
+for (const [name, args] of [['typecheck', ['node_modules/typescript/bin/tsc', '--noEmit']], ['build', ['node_modules/next/dist/bin/next', 'build']], ['tests', ['scripts/test-runner.mjs', '--run']]]) {
+    const r = spawnSync(process.execPath, args, { cwd: root, encoding: 'utf8', timeout: 300000, env: { ...process.env, NEXT_TELEMETRY_DISABLED: '1' } });
+    process.stdout.write(r.stdout || '');
+    process.stderr.write(r.stderr || '');
+    steps.push({ name, status: r.status === 0 ? 'pass' : 'fail', output: r.stdout, error: r.error?.message || r.stderr });
 }
-
-console.log("Starter verificable: PASS");
-console.log(`Reporte: ${report}`);
-
+const sha = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).stdout?.trim();
+const dirty = Boolean(spawnSync('git', ['status', '--porcelain'], { cwd: root, encoding: 'utf8' }).stdout?.trim());
+const status = !missing.length && steps.every(s => s.status === 'pass') ? 'pass' : 'fail';
+mkdirSync(resolve(root, 'test-results'), { recursive: true });
+writeFileSync(resolve(root, 'test-results/verification.json'), JSON.stringify({ status, sha, workingTreeModified: dirty, node: process.version, checkedAt: new Date().toISOString(), missing, steps }, null, 2));
+console.log('Verification: ' + status);
+process.exitCode = status === 'pass' ? 0 : 1;

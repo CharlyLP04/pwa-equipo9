@@ -2,7 +2,7 @@
 
 **Proyecto:** PWA de Inspecciones de Laboratorio — Universidad Tecnológica de Tehuacán  
 **Módulo:** Capacidades Nativas del Dispositivo y Notificaciones (Semana 06)  
-**Autor:** Carlos Olaya Gutiérrez (3523110786) — Equipo 9  
+**Autoría:** proyecto académico acumulado
 **Datos:** Estrictamente sintéticos, sin PII ni credenciales sensibles.
 
 ---
