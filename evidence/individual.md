@@ -128,7 +128,7 @@
 
 ## Montalvo Osorio Alexis (3523110113)
 
-- **Commit SHA individual:** Pendiente de registrar al cerrar la rama de trabajo.
+- **Commit SHA individual:** `bffe72e4a084fffd4a99e62784e1df243b90ddc3`
 - **Contribución técnica:** Creación de las suites unitarias `tests/unit/schema.spec.ts`, `tests/unit/conflict-policy.spec.ts` y `tests/unit/capabilities-pure.spec.ts`, además de la estrategia de pruebas documentada en `docs/test-strategy.md`.
 - **Decisión técnica que puedo explicar:** Se utilizaron aserciones de Node.js y ejecución mediante `tsx` para comprobar las reglas existentes sin modificar sus implementaciones. Los casos cubren validación de registros y operaciones, precedencia de conflictos por versión y fecha, desempate determinista, mapeo de laboratorios con coordenadas sintéticas y generación de evidencia ficticia. Las pruebas evitan depender de una cámara o ubicación física.
 - **Pruebas ejecutadas y resultado:**
