@@ -4,7 +4,7 @@
 
 **Rama:** `test/w08-integration-ci-pacheco`
 
-**Commit SHA individual:** Pendiente de registrar después del commit principal.
+**Commit SHA individual:** `867fb050529ad7788cbc7c9aa15470be1173128a`
 
 ### Aportaciones individuales
 
