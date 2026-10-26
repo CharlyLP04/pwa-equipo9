@@ -10,7 +10,7 @@ Se conserva la historia de commits de los tres integrantes mediante merges en se
 | Pacheco Avila Carlos Alberto | PR #26, integración y CI inicial | 867fb050529ad7788cbc7c9aa15470be1173128a |
 | Carlos Olaya Gutiérrez | E2E, regresiones, ejecutor y consolidación asistida | 52beb186e9ae4234dbf9563fb943f654ea9bcefb |
 
-El tag week-08-final-v2 identifica la entrega con la revisión humana confirmada. El tag week-08-final se conserva como versión técnica anterior. Los reportes generados registran el SHA exacto ejecutado; se obtiene también con git rev-parse HEAD. Las aportaciones originales no se reemplazan por una atribución colectiva.
+El tag week-08-final identifica la entrega con la revisión humana confirmada. Los reportes generados registran el SHA exacto ejecutado; se obtiene también con git rev-parse HEAD. Las aportaciones originales no se reemplazan por una atribución colectiva.
 
 ## Confirmación de revisión humana del equipo
 

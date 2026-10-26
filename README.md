@@ -4,7 +4,7 @@ Proyecto integrador acumulado de inspecciones y mantenimiento de laboratorios. E
 
 ## Incremento y responsabilidades
 
-Se integran las unitarias y estrategia de Alexis (PR #25), las pruebas de integración y CI inicial de Pacheco (PR #26), y el flujo crítico, regresiones adicionales, ejecutor y reportes preparados con asistencia de Codex. Los commits fuente se conservan en el historial. La integración está en semana-08-testing-ci; week-08-final-v2 identifica la entrega con revisión humana confirmada; week-08-final conserva la versión anterior.
+Se integran las unitarias y estrategia de Alexis (PR #25), las pruebas de integración y CI inicial de Pacheco (PR #26), y el flujo crítico, regresiones adicionales, ejecutor y reportes preparados con asistencia de Codex. Los commits fuente se conservan en el historial. La integración está en semana-08-testing-ci; week-08-final identifica la entrega con revisión humana confirmada.
 
 ## Entorno e instalación
 
