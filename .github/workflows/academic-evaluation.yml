@@ -1,0 +1,28 @@
+name: Semana 08 - Pirámide y evidencia
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Tipos, build, pirámide completa y verificación de artefactos
+        run: npm run verify
+      - name: Compatibilidad del comando académico
+        run: npm run test --if-present -- --run
+      - name: Evidencia
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semana-08-evidence
+          path: test-results/
+          if-no-files-found: error
