@@ -1,49 +1,182 @@
-import assert from 'node:assert/strict';
-import { SyncQueue, createMemoryStorage, DEFAULT_STORAGE_KEY, createIdempotentServer } from '../../src/lib/sync/queue';
-import { record, epoch } from '../helpers/fixture';
+
+import assert from "node:assert/strict";
+import {
+  SyncQueue,
+  createMemoryStorage,
+  computeBackoff,
+} from "../../src/lib/sync/queue";
+
 async function main() {
-    let now = epoch;
-    const storage = createMemoryStorage();
-    const options = { storage, now: () => now, maxAttempts: 3, baseBackoffMs: 100, maxBackoffMs: 150 };
-    let q = new SyncQueue(options);
-    const op = q.enqueue({ operationId: 'op-08', entityId: record.id, type: 'CREATE_INSPECTION', payload: record, revision: 1 });
-    assert.equal(JSON.parse(storage.read(DEFAULT_STORAGE_KEY)!)[0].status, 'pending');
-    q.enqueue({ operationId: 'op-08', entityId: record.id, type: 'CREATE_INSPECTION', payload: record });
-    assert.equal(q.size(), 1);
-    q.markInFlight(op.operationId);
-    assert.equal(JSON.parse(storage.read(DEFAULT_STORAGE_KEY)!)[0].status, 'inFlight');
-    assert.throws(() => q.markInFlight(op.operationId));
-    q = new SyncQueue(options);
-    assert.equal(q.find(op.operationId)?.status, 'pending');
-    assert.equal(q.find(op.operationId)?.idempotencyKey, op.idempotencyKey);
-    const server = createIdempotentServer();
-    const result = await q.process(async (item) => server.handle(item));
-    assert.equal(result.done, 1);
-    assert.equal(q.dequeueDone(), 1);
-    assert.equal(new SyncQueue(options).size(), 0);
-    q.enqueue({ operationId: 'retry', entityId: record.id, type: 'UPDATE_INSPECTION', payload: record });
-    const fail = async () => { throw new Error('Red sintética no disponible'); };
-    assert.equal((await q.process(fail)).retried, 1);
-    assert.equal(q.find('retry')?.nextAttemptAt, now + 100);
-    assert.equal((await q.process(fail)).sent, 0);
-    now += 100;
-    assert.equal((await q.process(fail)).retried, 1);
-    assert.equal(q.find('retry')?.nextAttemptAt, now + 150);
-    now += 150;
-    assert.equal((await q.process(fail)).failed, 1);
-    assert.equal(q.find('retry')?.status, 'failed');
-    q.retry('retry');
-    assert.equal(q.find('retry')?.attempts, 0);
-    assert.equal((await q.process(async (item) => ({ ...server.handle(item), operationId: 'wrong' }))).done, 0);
-    const ordered = new SyncQueue({ storage: createMemoryStorage(), now: () => epoch });
-    for (const revision of [1, 2])
-        ordered.enqueue({ operationId: 'rev-' + revision, entityId: record.id, type: 'UPDATE_INSPECTION', payload: record, revision });
-    ordered.markInFlight('rev-2');
-    assert.equal(ordered.acknowledge({ operationId: 'rev-2', serverId: 'srv', revision: 2 }), true);
-    ordered.markInFlight('rev-1');
-    assert.equal(ordered.acknowledge({ operationId: 'rev-1', serverId: 'srv', revision: 1 }), false);
-    assert.equal(ordered.find('rev-1')?.status, 'inFlight');
-    assert.equal(ordered.acknowledge({ operationId: 'unknown', serverId: 'srv', revision: 5 }), false);
-    console.log('sync-queue: persistencia, recuperación, backoff, agotamiento y ACK PASS');
+  const storage = createMemoryStorage();
+  let now = Date.parse("2026-10-01T12:00:00Z");
+
+  const queue = new SyncQueue({
+    storage,
+    now: () => now,
+    idFactory: () => "op-w08-001",
+    baseBackoffMs: 1000,
+    maxBackoffMs: 8000,
+  });
+
+  // 1. Enqueue y persistencia inmediata
+  const op = queue.enqueue({
+    entityId: "lab-sintetico-01",
+    type: "CREATE_INSPECTION",
+    payload: { status: "reportada" },
+    revision: 1,
+  });
+
+  assert.equal(op.status, "pending");
+  assert.equal(queue.size(), 1);
+  assert.equal(
+    JSON.parse(storage.read("utt-lab-outbox")!)[0].operationId,
+    op.operationId
+  );
+
+  // 2. Transición, ACK válido y limpieza
+  queue.markInFlight(op.operationId);
+  assert.equal(queue.find(op.operationId)?.status, "inFlight");
+  assert.equal(queue.find(op.operationId)?.attempts, 1);
+
+  assert.equal(
+    queue.acknowledge({
+      operationId: op.operationId,
+      serverId: "srv-sintetico-01",
+      revision: 1,
+    }),
+    true
+  );
+
+  assert.equal(queue.find(op.operationId)?.status, "done");
+  assert.equal(queue.dequeueDone(), 1);
+  assert.equal(queue.size(), 0);
+
+  // 3. Fallo simulado y backoff exponencial
+  const retryQueue = new SyncQueue({
+    storage: createMemoryStorage(),
+    now: () => now,
+    idFactory: () => "op-retry",
+    baseBackoffMs: 1000,
+    maxBackoffMs: 8000,
+  });
+
+  const retryOp = retryQueue.enqueue({
+    entityId: "lab-sintetico-02",
+    type: "UPDATE_INSPECTION",
+    payload: { status: "en-proceso" },
+  });
+
+  const failedResult = await retryQueue.process(async () => {
+    throw new Error("Fallo de red simulado");
+  });
+
+  assert.equal(failedResult.retried, 1);
+  assert.equal(retryQueue.find(retryOp.operationId)?.attempts, 1);
+  assert.equal(retryQueue.find(retryOp.operationId)?.status, "pending");
+  assert.equal(retryQueue.find(retryOp.operationId)?.nextAttemptAt, now + 1000);
+
+  now += 1000;
+
+  await retryQueue.process(async () => {
+    throw new Error("Segundo fallo simulado");
+  });
+
+  assert.equal(retryQueue.find(retryOp.operationId)?.attempts, 2);
+  assert.equal(retryQueue.find(retryOp.operationId)?.nextAttemptAt, now + 2000);
+
+  assert.equal(computeBackoff(1, 1000, 8000), 1000);
+  assert.equal(computeBackoff(2, 1000, 8000), 2000);
+  assert.equal(computeBackoff(4, 1000, 8000), 8000);
+  assert.equal(computeBackoff(6, 1000, 8000), 8000);
+
+  // 4. Recuperación después de cierre inesperado
+  const persistentStorage = createMemoryStorage();
+  const firstSession = new SyncQueue({
+    storage: persistentStorage,
+    now: () => now,
+  });
+
+  const interrupted = firstSession.enqueue({
+    operationId: "op-interrupted",
+    entityId: "lab-sintetico-03",
+    type: "CREATE_INSPECTION",
+    payload: { status: "reportada" },
+  });
+
+  firstSession.markInFlight(interrupted.operationId);
+
+  const secondSession = new SyncQueue({
+    storage: persistentStorage,
+    now: () => now,
+  });
+
+  assert.equal(secondSession.find(interrupted.operationId)?.status, "pending");
+  assert.equal(
+    secondSession.find(interrupted.operationId)?.idempotencyKey,
+    interrupted.idempotencyKey
+  );
+
+  // 5. Rechazo de ACK fuera de orden
+  const revisionQueue = new SyncQueue({
+    storage: createMemoryStorage(),
+    now: () => now,
+  });
+
+  const newer = revisionQueue.enqueue({
+    operationId: "op-revision-3",
+    entityId: "lab-sintetico-04",
+    type: "UPDATE_INSPECTION",
+    payload: { version: 3 },
+    revision: 3,
+  });
+
+  revisionQueue.markInFlight(newer.operationId);
+
+  assert.equal(
+    revisionQueue.acknowledge({
+      operationId: newer.operationId,
+      serverId: "srv-old",
+      revision: 2,
+    }),
+    false
+  );
+
+  assert.notEqual(revisionQueue.find(newer.operationId)?.status, "done");
+
+  assert.equal(
+    revisionQueue.acknowledge({
+      operationId: newer.operationId,
+      serverId: "srv-current",
+      revision: 3,
+    }),
+    true
+  );
+
+  const older = revisionQueue.enqueue({
+    operationId: "op-revision-2",
+    entityId: "lab-sintetico-04",
+    type: "UPDATE_INSPECTION",
+    payload: { version: 2 },
+    revision: 2,
+  });
+
+  revisionQueue.markInFlight(older.operationId);
+
+  assert.equal(
+    revisionQueue.acknowledge({
+      operationId: older.operationId,
+      serverId: "srv-stale",
+      revision: 2,
+    }),
+    false
+  );
+
+  assert.equal(revisionQueue.find(older.operationId)?.status, "inFlight");
+
+  console.log("sync-queue.spec.ts: PASS (5 grupos de integración)");
 }
-main().catch(e => { console.error(e); process.exitCode = 1; });
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

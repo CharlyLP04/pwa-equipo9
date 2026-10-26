@@ -15,6 +15,6 @@ for (const file of discover(resolve(root, 'tests'))) {
     results.push({ file: relative(root, file).replaceAll('\\', '/'), status: r.status === 0 ? 'pass' : 'fail', durationMs: Math.round(performance.now() - start), output: r.stdout, error: r.error?.message || r.stderr });
 }
 mkdirSync(resolve(root, 'test-results'), { recursive: true });
-writeFileSync(resolve(root, 'test-results/results.json'), JSON.stringify({ node: process.version, suites: results.length, passed: results.filter(r => r.status === 'pass').length, results }, null, 2));
+writeFileSync(resolve(root, 'test-results/results.json'), JSON.stringify({ sha: spawnSync('git', ['rev-parse', 'HEAD'], {cwd: root, encoding: 'utf8'}).stdout?.trim(), node: process.version, suites: results.length, passed: results.filter(r => r.status === 'pass').length, results }, null, 2));
 console.log(results.filter(r => r.status === 'pass').length + '/' + results.length + ' suites PASS');
-process.exitCode = results.some(r => r.status !== 'pass') ? 1 : 0;
+process.exitCode = results.length === 0 || results.some(r => r.status !== 'pass') ? 1 : 0;

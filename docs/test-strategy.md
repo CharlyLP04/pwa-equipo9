@@ -6,11 +6,11 @@ Se continúa el repositorio acumulado, base 6e2c2cf3c7739fa0148ffca902e1319fde02
 ## Pirámide y matriz de riesgos
 | Nivel | Suite nueva | Riesgo / oráculo |
 |---|---|---|
-| Unidad | schema | Campos ausentes, tipos incorrectos, valores negativos, fechas updatedAt/createdAt corruptas |
-| Unidad | conflict-policy | Pérdida por precedencia errónea; mayor versión, fecha y desempate en ambos sentidos |
-| Unidad | device-helpers | Dependencia de hardware, ubicación equivocada, pistas sin liberar; reloj fijo |
-| Integración | sync-queue | Pérdida tras recarga, reintento prematuro, agotamiento y ACK ajeno/antiguo |
-| Integración | server-dedup | Duplicación silenciosa; mismo oráculo en configuración sana y averiada |
+| Unidad | schema / schema-boundaries | Campos ausentes, tipos incorrectos, valores negativos, fechas updatedAt/createdAt corruptas |
+| Unidad | conflict-policy / conflict-policy-regression | Pérdida por precedencia errónea; mayor versión, fecha y desempate en ambos sentidos |
+| Unidad | capabilities-pure / device-helpers | Dependencia de hardware, ubicación equivocada, pistas sin liberar; reloj fijo |
+| Integración | sync-queue / sync-queue-recovery | Pérdida tras recarga, reintento prematuro, agotamiento y ACK ajeno/antiguo |
+| Integración | server-dedup / server-dedup-regression | Duplicación silenciosa; mismo oráculo en configuración sana y averiada |
 | Flujo sintético | critical-path | Captura offline, persistencia, recarga, evento online, ACK y vaciado; ACK perdido |
 
 La base prioriza casos de borde rápidos; el centro verifica colaboración real entre cola, almacenamiento y servidor simulado; la cima recorre dos escenarios de negocio. La distribución no se mide solo por número de archivos: las unitarias recorren tablas de casos. El informe cuenta suites, no inventa cantidades de aserciones ni porcentajes de cobertura.
@@ -35,3 +35,9 @@ AC-01: instalación limpia y build en el reporte. AC-02: rutas requeridas verifi
 
 ## Hallazgo en el check público original
 Se ejecutó public-tests/check.sh con Git Bash: imprimió coincidencias y PUBLIC_OK, y terminó con código 0. En Bash, una orden negada con ! queda exceptuada de set -e; el echo posterior enmascara el resultado negativo. Por tanto PUBLIC_OK no demuestra ausencia de coincidencias. No se modifica el check del profesor. La observación se conserva como limitación del evaluador público y no se usa para afirmar seguridad o calificación.
+
+## Consolidación de los tres aportes
+
+Se mantienen sin reescribir las tres suites unitarias originales de Alexis y las dos de integración de Pacheco. Se conservan adicionalmente seis suites de la rama asistida por Codex. Total: 18 suites incluyendo las siete heredadas. El runner incorpora todas automáticamente; ya no se necesita ejecutar las nuevas por separado. La estrategia fuente de Alexis permanece en history/w08-alexis-strategy.md y aporta la separación de niveles, matriz de riesgos y criterio de aceptación. El CI inicial de Pacheco se amplía con typescript, verificación integral, SHA y carga de reportes.
+
+La generación fotográfica original de Alexis compara contenido normalizando la fecha dinámica; device-helpers fija el reloj para comprobar identidad completa. Son dos comprobaciones complementarias del mismo contrato. No se impone un porcentaje de pirámide basado solo en archivos.

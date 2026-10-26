@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 const root = resolve(import.meta.dirname, '..');
-const required = ['tests/unit/schema.spec.ts', 'tests/unit/conflict-policy.spec.ts', 'tests/unit/device-helpers.spec.ts', 'tests/integration/sync-queue.spec.ts', 'tests/integration/server-dedup.spec.ts', 'tests/e2e/critical-path.spec.ts', 'docs/test-strategy.md', '.github/workflows/academic-evaluation.yml', 'evidence/individual.md'];
+const required = ['tests/unit/capabilities-pure.spec.ts', 'tests/unit/schema-boundaries.spec.ts', 'tests/unit/conflict-policy-regression.spec.ts', 'tests/integration/sync-queue-recovery.spec.ts', 'tests/integration/server-dedup-regression.spec.ts', 'README.md', 'package-lock.json', '.nvmrc', 'tests/unit/schema.spec.ts', 'tests/unit/conflict-policy.spec.ts', 'tests/unit/device-helpers.spec.ts', 'tests/integration/sync-queue.spec.ts', 'tests/integration/server-dedup.spec.ts', 'tests/e2e/critical-path.spec.ts', 'docs/test-strategy.md', '.github/workflows/academic-evaluation.yml', 'evidence/individual.md'];
 const missing = required.filter(f => !existsSync(resolve(root, f)));
 const steps = [];
 for (const [name, args] of [['typecheck', ['node_modules/typescript/bin/tsc', '--noEmit']], ['build', ['node_modules/next/dist/bin/next', 'build']], ['tests', ['scripts/test-runner.mjs', '--run']]]) {
