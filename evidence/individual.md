@@ -147,3 +147,24 @@ Se recupera la documentación y atribución del proyecto acumulado. Las declarac
 - **Pruebas ejecutadas:** `npm test`, `npm run build` y `npm run verify` con resultado PASS.
 - **Limitación encontrada:** Las pruebas verifican principalmente la estructura del Service Worker y simulan una navegación sin red. No se realizó una auditoría completa de funcionamiento offline en un navegador real.
 - **Uso declarado de IA:** ChatGPT como apoyo para diseño de pruebas y simulación; validado localmente con resultado PASS.
+
+
+----------------------------
+
+# Evidencia individual — Semana 08
+
+## Montalvo Osorio Alexis (3523110113)
+
+- **Commit SHA individual:** `bffe72e4a084fffd4a99e62784e1df243b90ddc3`
+- **Contribución técnica:** Creación de las suites unitarias `tests/unit/schema.spec.ts`, `tests/unit/conflict-policy.spec.ts` y `tests/unit/capabilities-pure.spec.ts`, además de la estrategia de pruebas documentada en `docs/test-strategy.md`.
+- **Decisión técnica que puedo explicar:** Se utilizaron aserciones de Node.js y ejecución mediante `tsx` para comprobar las reglas existentes sin modificar sus implementaciones. Los casos cubren validación de registros y operaciones, precedencia de conflictos por versión y fecha, desempate determinista, mapeo de laboratorios con coordenadas sintéticas y generación de evidencia ficticia. Las pruebas evitan depender de una cámara o ubicación física.
+- **Pruebas ejecutadas y resultado:**
+  - `npx tsx tests/unit/schema.spec.ts` — PASS.
+  - `npx tsx tests/unit/conflict-policy.spec.ts` — PASS.
+  - `npx tsx tests/unit/capabilities-pure.spec.ts` — PASS.
+  - `npm test` — PASS, suites existentes.
+  - `npm run build` — PASS.
+  - `npm run verify` — PASS.
+- **Limitación encontrada:** Las nuevas suites se ejecutaron por separado y aún no forman parte del comando general `npm test`. Su incorporación debe coordinarse con el responsable de `package.json`. Las pruebas de integración y E2E requieren la validación correspondiente del equipo.
+- **Cambio que puedo explicar o modificar en vivo:** Puedo demostrar los casos positivos y negativos de las funciones de esquema, modificar los escenarios de resolución de conflictos, comprobar el mapeo con coordenadas sintéticas y explicar la matriz de riesgos de la estrategia.
+- **Uso declarado de IA:** Utilicé ChatGPT como apoyo para diseñar escenarios de prueba y estructurar la documentación técnica. Revisé los archivos y ejecuté individualmente las tres suites, además de ejecutar las pruebas existentes, la compilación y la verificación del proyecto.
