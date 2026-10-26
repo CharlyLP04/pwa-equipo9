@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node tests/starter.spec.mjs && tsx tests/manifest.spec.ts && tsx tests/service-worker.spec.ts && tsx tests/offline.spec.ts && tsx tests/rendering.spec.ts && tsx tests/sync.spec.ts && tsx tests/capabilities.spec.ts",
+    "test": "node tests/starter.spec.mjs && tsx tests/manifest.spec.ts && tsx tests/service-worker.spec.ts && tsx tests/offline.spec.ts && tsx tests/rendering.spec.ts && tsx tests/sync.spec.ts && tsx tests/capabilities.spec.ts && tsx tests/integration/sync-queue.spec.ts && tsx tests/integration/server-dedup.spec.ts",
     "verify": "node scripts/verify.mjs"
   },
   "dependencies": {

@@ -1,0 +1,33 @@
+
+name: Academic Evaluation - Week 08
+
+on:
+  push:
+    branches:
+      - main
+      - "test/**"
+  pull_request:
+
+jobs:
+  academic-evaluation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Build application
+        run: npm run build
+
+      - name: Run test pyramid
+        run: npm run test --if-present -- --run

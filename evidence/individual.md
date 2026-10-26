@@ -1,3 +1,45 @@
+## Semana 08 — Segundo parcial — Pacheco Avila Carlos Alberto
+
+**Área:** Pruebas de integración y configuración de CI.
+
+**Rama:** `test/w08-integration-ci-pacheco`
+
+**Commit SHA individual:** Pendiente de registrar después del commit principal.
+
+### Aportaciones individuales
+
+- Implementación de `tests/integration/sync-queue.spec.ts` con cinco grupos de verificación: persistencia, transiciones de estado, ACK válido, reintentos con backoff exponencial, recuperación después de cierre inesperado y rechazo de respuestas fuera de orden.
+- Implementación de `tests/integration/server-dedup.spec.ts` para verificar la deduplicación de operaciones y detectar su desactivación mediante un escenario de sabotaje controlado.
+- Creación del workflow `.github/workflows/academic-evaluation.yml` para ejecutar instalación de dependencias, compilación y pruebas automatizadas.
+- Actualización de `package.json` para incorporar ambas suites a la ejecución general.
+
+### Decisión técnica
+
+Se utilizaron almacenamiento en memoria, identificadores sintéticos y funciones deterministas para validar la interacción entre componentes sin depender de conexiones externas.
+
+La prueba antisabotaje comprueba que el sistema de detección identifica la creación de registros duplicados cuando se desactiva la deduplicación, sin introducir un fallo permanente en la ejecución normal de CI.
+
+### Comandos de verificación
+
+- `npx.cmd tsx tests/integration/sync-queue.spec.ts` — PASS.
+- `npx.cmd tsx tests/integration/server-dedup.spec.ts` — PASS.
+- `npm.cmd test` — PASS.
+- `npm.cmd run test -- --run` — PASS.
+- `npm.cmd run build` — PASS.
+- `npm.cmd run verify` — PASS.
+- `git diff --check` — Sin errores.
+
+### Limitaciones
+
+Las pruebas utilizan almacenamiento y servidor simulados. No sustituyen las pruebas de integración con infraestructura real ni la verificación del workflow en GitHub Actions.
+
+### Declaración de uso de IA
+
+Se utilizó ChatGPT (OpenAI) como apoyo para diseñar escenarios de prueba, estructurar los archivos TypeScript y configurar el workflow de CI.
+
+La implementación fue revisada e integrada manualmente. Se ejecutaron las pruebas y verificaciones en el entorno local, comprobando sus resultados antes de registrar los cambios.
+
+
 # Evidencia Individual — Semana 06
 
 ## Carlos Olaya Gutiérrez (3523110786)
