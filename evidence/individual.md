@@ -10,14 +10,18 @@ Se conserva la historia de commits de los tres integrantes mediante merges en se
 | Pacheco Avila Carlos Alberto | PR #26, integración y CI inicial | 867fb050529ad7788cbc7c9aa15470be1173128a |
 | Carlos Olaya Gutiérrez | E2E, regresiones, ejecutor y consolidación asistida | 52beb186e9ae4234dbf9563fb943f654ea9bcefb |
 
-El tag week-08-final identifica el commit consolidado para entregar. Los reportes generados registran el SHA exacto ejecutado; se obtiene también con git rev-parse HEAD. Las aportaciones originales no se reemplazan por una atribución colectiva.
+El tag week-08-final-v2 identifica la entrega con la revisión humana confirmada. El tag week-08-final se conserva como versión técnica anterior. Los reportes generados registran el SHA exacto ejecutado; se obtiene también con git rev-parse HEAD. Las aportaciones originales no se reemplazan por una atribución colectiva.
+
+## Confirmación de revisión humana del equipo
+
+Carlos Olaya Gutiérrez confirmó que él, Montalvo Osorio Alexis y Pacheco Avila Carlos Alberto ya revisaron el código, los resultados y sus aportaciones en la entrega consolidada. Esta revisión ocurrió después de la publicación de week-08-final y queda registrada en esta actualización de evidencia. Se mantiene la declaración de uso de IA y la distinción entre ejecución automatizada y revisión humana. Las limitaciones técnicas documentadas siguen vigentes.
 
 ## Carlos Olaya Gutiérrez — consolidación y flujo crítico
 
 - Decisión técnica: conservar los archivos originales de los compañeros y ejecutar automáticamente todas las suites. Los casos adicionales quedan en schema-boundaries, conflict-policy-regression, sync-queue-recovery y server-dedup-regression; device-helpers y critical-path completan la comprobación.
 - Prueba: npm ci --ignore-scripts --no-audit --no-fund seguido de npm run verify, equivalente a make verify. Los resultados reales se encuentran en test-results/verification.json y results.json y en los artefactos de Actions; no se afirma que estos comandos hayan sido ejecutados manualmente por el estudiante.
 - Limitación: el E2E es de dominio con almacenamiento y conectividad simulados. No valida React ni permisos del navegador. El esquema heredado admite date como texto y el escáner público presenta coincidencias léxicas no concluyentes.
-- IA: OpenAI Codex se utilizó para diseñar pruebas complementarias, integrar ramas, resolver conflictos, redactar documentación y ejecutar verificaciones. La validación automatizada fue realizada por el agente. La revisión humana y defensa individual del estudiante no se han confirmado en este registro.
+- IA: OpenAI Codex se utilizó para diseñar pruebas complementarias, integrar ramas, resolver conflictos, redactar documentación y ejecutar verificaciones. La validación automatizada fue realizada por el agente. La revisión humana del código, los resultados y las aportaciones fue confirmada por Carlos para los tres integrantes después de publicar week-08-final. Esta confirmación no implica que todos ejecutaran manualmente los comandos ni que se haya realizado ya una defensa ante el docente.
 - Defensa: explicar el ACK perdido, la conservación de idempotencyKey, el oráculo que detecta duplicados y la diferencia entre E2E sintético y navegador.
 
 ## Declaraciones originales de Alexis y Pacheco

@@ -4,7 +4,7 @@ Proyecto integrador acumulado de inspecciones y mantenimiento de laboratorios. E
 
 ## Incremento y responsabilidades
 
-Se integran las unitarias y estrategia de Alexis (PR #25), las pruebas de integración y CI inicial de Pacheco (PR #26), y el flujo crítico, regresiones adicionales, ejecutor y reportes preparados con asistencia de Codex. Los commits fuente se conservan en el historial. La integración está en semana-08-testing-ci; week-08-final identifica la entrega validada.
+Se integran las unitarias y estrategia de Alexis (PR #25), las pruebas de integración y CI inicial de Pacheco (PR #26), y el flujo crítico, regresiones adicionales, ejecutor y reportes preparados con asistencia de Codex. Los commits fuente se conservan en el historial. La integración está en semana-08-testing-ci; week-08-final-v2 identifica la entrega con revisión humana confirmada; week-08-final conserva la versión anterior.
 
 ## Entorno e instalación
 
@@ -50,7 +50,7 @@ Se preservan los contratos de producción. date es texto libre en el esquema her
 
 El check público original imprime coincidencias léxicas en documentación y una dependencia legítima del lockfile, pero devuelve PUBLIC_OK por su uso de negación en Bash. La estrategia explica el diagnóstico; el check y el lockfile se conservan sin ocultar coincidencias. Esta salida no certifica seguridad ni una nota de 8/8.
 
-Antes de entregar, cada integrante debe revisar su aportación y poder explicarla. Se declara el uso de IA; no se atribuye revisión humana no confirmada.
+Carlos confirmó la revisión del código, los resultados y las aportaciones por los tres integrantes después del primer tag. La confirmación está registrada en evidence/individual.md. Se mantiene la declaración de IA y cada integrante debe poder explicar su contribución.
 
 ## Documentación acumulada
 
