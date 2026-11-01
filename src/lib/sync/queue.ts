@@ -390,6 +390,12 @@ export class SyncQueue {
     return counts;
   }
 
+  /** Purga explícita para cierre de sesión; no modifica operaciones del servidor. */
+  clear(): void {
+    this.operations = [];
+    this.persist();
+  }
+
   size(): number {
     return this.operations.length;
   }

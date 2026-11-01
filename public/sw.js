@@ -16,7 +16,7 @@
  */
 
 // Versión del Service Worker y nombres de depósitos de caché
-const SW_VERSION = 'v1.0.0';
+const SW_VERSION = 'v2.0.0';
 const STATIC_CACHE = `utt-lab-static-${SW_VERSION}`;
 const DATA_CACHE = `utt-lab-data-${SW_VERSION}`;
 const FALLBACK_CACHE = `utt-lab-fallback-${SW_VERSION}`;
@@ -32,8 +32,8 @@ const PRECACHE_RESOURCES = [
   '/',
   '/manifest.webmanifest',
   '/offline.html',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png'
 ];
 
 /**
@@ -125,7 +125,7 @@ self.addEventListener('activate', (event) => {
       // Limpieza atómica de cachés obsoletas
       const cacheNames = await caches.keys();
       const deletionPromises = cacheNames.map((name) => {
-        if (!CURRENT_CACHES.includes(name)) {
+        if (name.startsWith('utt-lab-') && !CURRENT_CACHES.includes(name)) {
           return caches.delete(name);
         }
         return Promise.resolve();
@@ -161,6 +161,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Las rutas privadas nunca consultan ni escriben caché, incluso para respuestas RSC.
+  if (url.pathname.startsWith('/inspecciones') || url.pathname.startsWith('/api/')) {
+    event.respondWith(fetch(request, {cache:'no-store'}).catch(() => new Response(
+      request.mode==='navigate' ? '<!DOCTYPE html><html lang="es"><body><h1>Modo Desconectado</h1><p>No se muestran datos de sesiones anteriores. Recupera la conexión para abrir una sesión.</p></body></html>' : JSON.stringify({error:'Sin conexión'}),
+      {status:request.mode==='navigate'?200:503,headers:{'Content-Type':request.mode==='navigate'?'text/html; charset=utf-8':'application/json','Cache-Control':'no-store'}}
+    )));return;
+  }
   // --- Estrategia A: Navegación de páginas HTML ---
   if (request.mode === 'navigate') {
     event.respondWith(handleNavigationRequest(request));
@@ -340,3 +347,5 @@ function isStaticAsset(request, url) {
   ];
   return staticExtensions.some((ext) => url.pathname.endsWith(ext));
 }
+
+self.addEventListener('message',event=>{if(event.data?.type==='CLEAR_PRIVATE_SESSION')event.waitUntil((async()=>{for(const name of await caches.keys())if(name.startsWith('utt-lab-'))await caches.delete(name);})());});

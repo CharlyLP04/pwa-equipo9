@@ -3,7 +3,10 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { inspections, Inspection } from "@/lib/data/inspections";
+import { type Inspection } from "@/lib/data/inspections";
+import {SecuritySessionPanel,useSecuritySession} from '@/components/security-session-panel';
+import {isSecuredInspectionRecord,canViewInspection,authorizeAction} from '@/lib/security';
+import {getSessionContext} from '@/lib/security/client-session';
 import { LoadingState } from "@/components/loading-state";
 
 interface SyntheticChecklistItem {
@@ -23,11 +26,12 @@ interface SyntheticChecklistItem {
  * 4. Compatibilidad con el almacenamiento en caché del Service Worker en modo desconectado.
  */
 export default function InspeccionDetallePage() {
+  const session=useSecuritySession();
   const params = useParams();
   const id = typeof params?.id === "string" ? params.id : Array.isArray(params?.id) ? params.id[0] : "";
 
   const [isLoading, setIsLoading] = useState(true);
-  const [inspection, setInspection] = useState<Inspection | null>(null);
+  const [inspection, setInspection] = useState<(Inspection & {ownerId:string;laboratoryTag:string}) | null>(null);
   const [checklist, setChecklist] = useState<SyntheticChecklistItem[]>([
     { label: "Inspección visual de cableado estructurado", verified: true, notes: "Canaletas aseguradas" },
     { label: "Condiciones de ventilación y temperatura", verified: true, notes: "Climatización en rango operativo" },
@@ -37,26 +41,31 @@ export default function InspeccionDetallePage() {
   const [interactiveNotice, setInteractiveNotice] = useState<string | null>(null);
 
   useEffect(() => {
+    setInspection(null);setIsLoading(true);
     // Simulación de carga asíncrona de cliente para evidenciar el estado de transición
-    const timer = setTimeout(() => {
-      let found = inspections.find((item) => item.id.toLowerCase() === id.toLowerCase());
+    const timer = setTimeout(async () => {
+      let found: (Inspection & {ownerId:string;laboratoryTag:string}) | undefined;
+      // El catálogo público sintético no proporciona identidad de propietario: se deniega por defecto.
       if (!found && typeof window !== "undefined") {
         try {
           const raw = window.localStorage.getItem("utt-local-inspections");
           if (raw) {
-            const localList: Inspection[] = JSON.parse(raw);
-            found = localList.find((item) => item.id.toLowerCase() === id.toLowerCase());
+            const localList: unknown = JSON.parse(raw);
+            if(Array.isArray(localList))found = localList.filter(isSecuredInspectionRecord).find(item => item.id.toLowerCase()===id.toLowerCase() && canViewInspection(session,item));
           }
         } catch {}
       }
+      if(navigator.onLine && session.role!=='visitor')try{const response=await fetch('/api/secure-inspections?id='+encodeURIComponent(id),{cache:'no-store'});if(response.ok){const data=await response.json();found=isSecuredInspectionRecord(data)&&canViewInspection(session,data)?data:undefined;}else if(response.status===403||response.status===401)found=undefined;}catch{}
+      if(session!==getSessionContext())return;
       setInspection(found || null);
       setIsLoading(false);
     }, 450);
 
     return () => clearTimeout(timer);
-  }, [id]);
+  }, [id,session]);
 
   const handleToggleChecklist = (index: number) => {
+    if(!inspection || authorizeAction(getSessionContext(),'update',inspection).status!==200)return;
     setChecklist((prev) =>
       prev.map((item, i) => (i === index ? { ...item, verified: !item.verified } : item))
     );
@@ -64,7 +73,7 @@ export default function InspeccionDetallePage() {
   };
 
   const handleToggleStatus = () => {
-    if (!inspection) return;
+    if (!inspection || authorizeAction(getSessionContext(),'update',inspection).status!==200) return;
     const nextStatus = inspection.status === "ok" ? "attention" : "ok";
     const nextLabel = nextStatus === "ok" ? "Sin incidencias" : "Requiere atención";
     setInspection({
@@ -78,6 +87,7 @@ export default function InspeccionDetallePage() {
 
   return (
     <div className="inspection-detail-wrapper" style={{ maxWidth: "860px", margin: "0 auto", padding: "24px 16px" }}>
+      <SecuritySessionPanel />
       {/* Navegación y migas de pan */}
       <nav aria-label="Migas de pan" style={{ marginBottom: "20px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", color: "var(--color-muted, #5e6c84)" }}>
@@ -100,7 +110,7 @@ export default function InspeccionDetallePage() {
           <section aria-label="Cargando inspección">
             <LoadingState variant="detail" message={`Cargando detalle de la inspección ${id}...`} />
           </section>
-        ) : !inspection ? (
+        ) : !inspection || !canViewInspection(session,inspection) ? (
           /* Estado de Error / Inspección no encontrada */
           <section
             role="alert"

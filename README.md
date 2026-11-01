@@ -1,3 +1,45 @@
+# Semana 09 — núcleo de Carlos en desarrollo local
+
+La autenticación es real y usa cuentas sintéticas; los roles proceden del servidor, no de un selector del navegador. Este incremento se mantiene en la rama feat/w09-security-core-carlos. Los documentos finales de amenazas e inventario corresponden a Alexis; tests/security.spec.ts y la consolidación de CI quedan para la coordinación con Pacheco. La sección histórica de Semana 08 se conserva más abajo.
+
+## Arranque de Semana 09
+
+Requiere un único proceso Node local. No está preparado para Vercel ni varios procesos compartiendo almacenamiento.
+
+~~~sh
+npm ci --ignore-scripts --no-audit --no-fund
+node scripts/provision-local-accounts.mjs
+npm run dev -- --hostname 127.0.0.1
+~~~
+
+La provisión se ejecuta una sola vez y no sobrescribe cuentas existentes. Las identidades son inspector-a, inspector-b y supervisor. Consulta sus frases de acceso generadas en .local/access.txt únicamente en este equipo. Guarda las frases en un lugar privado y elimina ese archivo después de las comprobaciones HTTP. La carpeta .local/ está excluida de Git; contiene los verificadores derivados con scrypt y los reportes sintéticos confirmados. No copiar su contenido a evidencias ni a Classroom.
+
+Abre http://127.0.0.1:3000/inspecciones. El supervisor tiene alcance en Laboratorio de Redes y Telecomunicaciones. El catálogo histórico es público y sintético; las capturas autenticadas se consultan mediante /api/secure-inspections. El campo de responsable se normaliza en el servidor a la identidad autenticada.
+
+## Comprobaciones del núcleo
+
+~~~sh
+npm run verify
+# Con el servidor activo en 127.0.0.1:3000 y access.txt todavía disponible:
+node scripts/check-security-http.mjs
+~~~
+
+UTT_TEST_ORIGIN permite elegir otro origen para esa comprobación. UTT_APP_ORIGIN fija el origen admitido por las mutaciones; sin esa variable se usa el protocolo y host de la petición local. No ejecutar dos instancias sobre la misma carpeta .local/.
+
+La suite propia está en tests/unit/security-core.spec.ts; no sustituye la suite final de Pacheco. Comprueba RBAC, riesgo estricto, escape textual, minimización y purga. La comprobación HTTP verifica acceso real, cookie HttpOnly, rechazo entre propietarios, riesgo 99, aprobación, origen y revocación. No hay frases de acceso predefinidas ni servicios externos.
+
+## Decisiones y límites del incremento
+
+- La sesión dura 30 minutos; el identificador aleatorio se transporta en cookie HttpOnly y SameSite=Strict. Secure se activa con HTTPS. Reiniciar Node invalida las sesiones; los reportes se conservan en disco mediante reemplazo del archivo completo.
+- Cerrar sesión purga borradores, cola y cachés de la aplicación. Sin red, la revocación se registra como pendiente y se realiza al volver a abrir la aplicación con conexión. Hasta entonces el servidor no puede recibir la solicitud de revocación; la interfaz informa esa limitación. No compartir la tableta hasta confirmar el cierre con red.
+- Tras recargar sin conexión se deniega el acceso privado. Una pestaña ya autenticada puede capturar sin red mientras su sesión local siga vigente. Los borradores locales no están cifrados: una tableta perdida con una sesión abierta sigue siendo un riesgo residual. Usar bloqueo del dispositivo y únicamente datos sintéticos.
+- El servidor implementa creación, consulta y aprobación. Los cambios del checklist en la página de detalle siguen siendo demostraciones en memoria y no afirman actualizar el servidor.
+- React muestra los comentarios como texto; sanitizeLiteralText se reserva para destinos HTML textuales para evitar doble escape. CSP usa un valor aleatorio por respuesta para scripts, y conserva estilos inline del diseño anterior. La excepción de evaluación dinámica solo existe en desarrollo.
+- El escáner léxico propuesto produce falsos positivos en dependencias heredadas y en el atributo estándar del campo de frase de acceso. No se ha modificado el escáner ni escondido coincidencias. Este punto requiere acuerdo con el profesor antes de afirmar cumplimiento total del check literal.
+- Implementación y validación automatizada asistidas por Codex. La revisión humana de este incremento de Semana 09 queda pendiente; no se atribuye al equipo una ejecución manual que no ha confirmado.
+
+---
+
 # PWA de inspecciones — entrega Semana 08
 
 Proyecto integrador acumulado de inspecciones y mantenimiento de laboratorios. Equipo: Carlos Olaya Gutiérrez, Montalvo Osorio Alexis y Pacheco Avila Carlos Alberto. Datos funcionales y escenarios de prueba exclusivamente sintéticos.
