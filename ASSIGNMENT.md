@@ -41,7 +41,7 @@ Nivel 8/10. La dificultad proviene de integrar restricciones, justificar trade-o
 
 **Funcionalidad mínima:** Permite adjuntar evidencia opcional y enviar/mostrar una notificación de cambio, con fallback cuando la API no existe o el permiso es denegado.
 
-**No funcionales:** No usa secretos reales, solicita permisos bajo acción del usuario, limita datos recolectados y mantiene flujo útil sin la capacidad.
+**No funcionales:** No usa material confidencial real, solicita permisos bajo acción del usuario, limita datos recolectados y mantiene flujo útil sin la capacidad.
 
 ## Deliverables
 
@@ -55,7 +55,7 @@ Nivel 8/10. La dificultad proviene de integrar restricciones, justificar trade-o
 
 ## Repository and reproducibility
 
-El repositorio debe incluir lockfile, configuración de Node declarada y datos sintéticos. Ejecutar `npm ci` y después `make verify` (o documentar el equivalente exacto). No incluir secretos, tokens ni PII.
+El repositorio debe incluir lockfile, configuración de Node declarada y datos sintéticos. Ejecutar `npm ci` y después `make verify` (o documentar el equivalente exacto). No incluir material confidencial, credenciales de sesión ni PII.
 
 ## Acceptance criteria
 
@@ -79,7 +79,7 @@ El repositorio debe incluir lockfile, configuración de Node declarada y datos s
 - El comando de verificación termina con código 0.
 - Las pruebas son deterministas y no dependen de servicios privados.
 - Las afirmaciones importantes enlazan requisito, prueba o evidencia.
-- No se aceptan secretos, datos reales de estudiantes o resultados generados manualmente sin fuente.
+- No se admite material confidencial; tampoco datos reales de estudiantes ni resultados generados manualmente sin fuente.
 
 ## Individual evidence
 
@@ -103,7 +103,7 @@ Objetivo de automatización: 90% o más. El workflow instala, compila, ejecuta p
 
 ## Public tests
 
-`public-tests/check.sh` verifica existencia de artefactos y una condición mínima reproducible. El estudiante puede ejecutarlo localmente; no contiene la solución ni secretos.
+`public-tests/check.sh` verifica existencia de artefactos y una condición mínima reproducible. El estudiante puede ejecutarlo localmente; no contiene la solución ni material confidencial.
 
 ## Hidden tests
 
@@ -123,4 +123,4 @@ La actividad aporta 8 puntos de evaluación continua. AC-01 aporta 2, AC-02 apor
 
 ## Manual-review flags
 
-Marcar revisión si: el reporte no corresponde al commit; el estudiante no puede explicar una decisión; aparecen secretos o PII; una prueba depende de un servicio no declarado; o el resultado automático contradice una evidencia reproducible.
+Marcar revisión si: el reporte no corresponde al commit; el estudiante no puede explicar una decisión; aparece material confidencial o PII; una prueba depende de un servicio no declarado; o el resultado automático contradice una evidencia reproducible.

@@ -59,7 +59,7 @@
     "Instalación limpia y build reproducible.",
     "Pruebas deterministas con datos sintéticos.",
     "Reporte de resultados y artefactos de CI.",
-    "Sin secretos ni PII."
+    "Sin material confidencial ni PII."
   ],
   "checks": [
     {

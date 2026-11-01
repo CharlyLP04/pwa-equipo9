@@ -1,3 +1,17 @@
+# Evidencia individual — Semana 09
+
+## Carlos Olaya Gutiérrez — núcleo de seguridad e integración
+
+- Commit del incremento revisado: 9e684c158709cd7e7dd711d4063ae6c15a1c3a8b, rama feat/w09-security-core-carlos.
+- Validación humana confirmada por Carlos: revisé, probé y validé manualmente en local la autenticación, RBAC por rol, validación con respuesta 400, CSP con nonce por respuesta y purga offline al cerrar sesión.
+- Decisión técnica: comprobar identidad y permisos en el servidor Node local, minimizar datos persistidos y rechazar por defecto el acceso fuera del propietario o alcance asignado.
+- Verificación automatizada del incremento: npm run verify, 19/19 suites, build de producción y comprobaciones HTTP y de navegador. La ejecución automatizada por Codex y la validación manual declarada por Carlos son evidencias distintas.
+- Comprobación automatizada de los ajustes posteriores: npm ci, npm run build y npm test (19/19 suites); acceso HTTP y navegador Chrome sobre el build de producción sin archivo de cuentas, enmascaramiento visual, purga offline y revocación al reconectar. El archivo de cuentas previo se restauró al terminar.
+- Limitaciones: servidor de un solo proceso, datos sintéticos, borradores sin cifrado y revocación remota diferida cuando no existe conexión. El escáner literal detecta el nombre de una dependencia del lockfile, sin que eso implique una credencial expuesta.
+- Uso declarado de IA: OpenAI Codex asistió en implementación, pruebas y documentación. Carlos revisó y validó personalmente el incremento señalado. Los ajustes posteriores de cuentas predeterminadas y enmascaramiento visual tienen comprobación automatizada; esta nota no anticipa una nueva validación manual.
+
+---
+
 # Evidencia individual — Semana 08
 
 ## Alcance del equipo y trazabilidad

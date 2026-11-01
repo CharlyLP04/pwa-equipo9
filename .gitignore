@@ -10,3 +10,5 @@ reports/verification.json
 
 test-results/
 *.tsbuildinfo
+
+.local/

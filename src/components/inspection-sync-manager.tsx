@@ -2,9 +2,12 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import {SecuritySessionPanel,useSecuritySession} from './security-session-panel';
+import {isSecuredInspectionRecord,prepareInspection,canViewInspection,canApproveInspection,authorizeAction,minimizeLocationData} from '@/lib/security';
+import {getSessionContext,getSessionGeneration} from '@/lib/security/client-session';
+type SecureRecord = LocalInspectionRecord & {ownerId:string;laboratoryTag:string;riskLevel:number;approved?:boolean};
 import {
   SyncQueue,
-  createIdempotentServer,
   DEFAULT_STORAGE_KEY,
   OutboxOperation,
 } from "@/lib/sync/queue";
@@ -33,6 +36,8 @@ function getBrowserStorage() {
 }
 
 export function InspectionSyncManager() {
+  const session=useSecuritySession();
+  const [riskLevel,setRiskLevel]=useState(1);
   const [isOnline, setIsOnline] = useState<boolean>(true);
   const [pendingCount, setPendingCount] = useState<number>(0);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
@@ -52,12 +57,12 @@ export function InspectionSyncManager() {
   const [isLocating, setIsLocating] = useState<boolean>(false);
 
   // Inspecciones locales capturadas
-  const [localInspections, setLocalInspections] = useState<LocalInspectionRecord[]>([]);
+  const [localInspections, setLocalInspections] = useState<SecureRecord[]>([]);
 
   // Instancia de cola
   const getQueue = useCallback(() => {
     return new SyncQueue({
-      storage: getBrowserStorage(),
+      storage: (()=>{const storage=getBrowserStorage();const generation=getSessionGeneration();return {read:storage.read,write:(key:string,value:string)=>{if(generation===getSessionGeneration())storage.write(key,value);}};})(),
       storageKey: DEFAULT_STORAGE_KEY,
     });
   }, []);
@@ -75,36 +80,46 @@ export function InspectionSyncManager() {
 
   // Cargar inspecciones locales
   const loadLocalInspections = useCallback(() => {
+    const generation=getSessionGeneration();
     if (typeof window === "undefined") return;
     try {
       const raw = window.localStorage.getItem(LOCAL_STORAGE_INSPECTIONS_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
-          setLocalInspections(parsed);
+          setLocalInspections(parsed.filter((item):item is SecureRecord => isSecuredInspectionRecord(item) && canViewInspection(getSessionContext(), item)));
         }
       }
     } catch (e) {
       console.warn("Error leyendo inspecciones locales:", e);
     }
+    if(getSessionContext().role!=='visitor')void fetch('/api/secure-inspections',{cache:'no-store'}).then(response=>response.ok?response.json():[]).then(records=>{if(generation===getSessionGeneration() && Array.isArray(records))setLocalInspections(local=>{const merged=new Map(local.map(item=>[item.id,item]));for(const item of records.filter(isSecuredInspectionRecord))merged.set(item.id,item);return Array.from(merged.values()).filter(item=>canViewInspection(getSessionContext(),item));});}).catch(()=>{});
   }, []);
 
   // Sincronización con el servidor idempotente
   const handleSync = useCallback(async () => {
-    if (isSyncing) return;
+    if (isSyncing || getSessionContext().role === 'visitor') return;
+    const generation=getSessionGeneration();
     setIsSyncing(true);
     setSyncFeedback(null);
 
     try {
       const q = getQueue();
-      const server = createIdempotentServer({ deduplicationEnabled: true });
+
 
       const result = await q.process(async (op: OutboxOperation) => {
-        return server.handle(op);
+        if(generation!==getSessionGeneration())throw new Error('Sesión cerrada');
+        const payload=op.payload as SecureRecord;
+        const allowed=authorizeAction(getSessionContext(),op.type==='CREATE_INSPECTION'?'create':'update',payload);
+        if(allowed.status!==200)throw new Error('Acceso denegado');
+        const response=await fetch('/api/secure-inspections',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(op)});
+        if(!response.ok)throw new Error('Servidor: '+response.status);return response.json();
       });
 
+      if(generation!==getSessionGeneration())return;
       // Purgar confirmadas de la cola
       const cleared = q.dequeueDone();
+      loadLocalInspections();
       updatePendingCount();
 
       if (result.done > 0 || cleared > 0) {
@@ -124,7 +139,13 @@ export function InspectionSyncManager() {
     } finally {
       setIsSyncing(false);
     }
-  }, [getQueue, isSyncing, updatePendingCount]);
+  }, [getQueue, isSyncing, updatePendingCount, loadLocalInspections]);
+
+  useEffect(()=>{
+    setCameraResult(null);setGeoResult(null);setSummary('Revisión preventiva sintética.');
+    setInspector(session.userId);setFindings(0);setRiskLevel(1);setSyncFeedback(null);
+    setLocalInspections([]);loadLocalInspections();
+  },[session,loadLocalInspections]);
 
   // Listener de conectividad y carga inicial
   useEffect(() => {
@@ -156,13 +177,14 @@ export function InspectionSyncManager() {
 
   // Captura de foto con fallback (Semana 06)
   const handleCapturePhoto = async () => {
+    const generation=getSessionGeneration();
     setIsCapturingPhoto(true);
     try {
       const result = await captureWithFallback({
         allowSyntheticFallback: true,
         syntheticInspectionId: `insp-${Date.now()}`,
       });
-      setCameraResult(result);
+      if(generation===getSessionGeneration())setCameraResult(result);
     } catch (err) {
       console.warn("Fallo al capturar foto:", err);
     } finally {
@@ -172,12 +194,15 @@ export function InspectionSyncManager() {
 
   // Detección de laboratorio por GPS con fallback (Semana 06)
   const handleDetectLocation = async () => {
+    const generation=getSessionGeneration();
     setIsLocating(true);
     try {
       const result = await getLocationWithFallback(location, {
         allowManualFallback: true,
       });
-      setGeoResult(result);
+      if(generation!==getSessionGeneration())return;
+      const minimal=minimizeLocationData(result);
+      setGeoResult({...minimal,success:result.success,fallbackUsed:result.fallbackUsed,fallbackReason:result.fallbackReason,timestamp:result.timestamp});
       if (result.laboratoryTag) {
         setLocation(result.laboratoryTag);
       }
@@ -192,10 +217,13 @@ export function InspectionSyncManager() {
   const handleSaveInspection = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newId = `insp-loc-${Date.now().toString().slice(-6)}`;
+    const input=prepareInspection(getSessionContext(),{location,inspector,summary,findings,riskLevel});
+    if(input.status!==200){setSyncFeedback(input.status+': '+input.error);return;}
+    const newId = 'insp-loc-'+crypto.randomUUID();
     const nowIso = new Date().toISOString();
 
-    const record: LocalInspectionRecord = {
+    const record: SecureRecord = {
+      ...input.data,
       id: newId,
       location,
       date: nowIso.slice(0, 10),
@@ -216,12 +244,13 @@ export function InspectionSyncManager() {
     // 1. Guardar localmente en localStorage
     try {
       const currentRaw = window.localStorage.getItem(LOCAL_STORAGE_INSPECTIONS_KEY);
-      const list: LocalInspectionRecord[] = currentRaw ? JSON.parse(currentRaw) : [];
+      const stored:unknown = currentRaw ? JSON.parse(currentRaw) : [];
+      const list: SecureRecord[] = Array.isArray(stored) ? stored.filter(isSecuredInspectionRecord) : [];
       list.unshift(record);
       window.localStorage.setItem(LOCAL_STORAGE_INSPECTIONS_KEY, JSON.stringify(list));
-      setLocalInspections(list);
+      setLocalInspections(list.filter(item=>canViewInspection(getSessionContext(),item)));
     } catch (err) {
-      console.error("Error guardando inspección en storage local:", err);
+      setSyncFeedback("Error: no se pudo persistir la inspección.");return;
     }
 
     // 2. Encolar en la outbox de SyncQueue
@@ -258,6 +287,7 @@ export function InspectionSyncManager() {
 
   return (
     <div className="sync-integration-container" style={{ marginBottom: "32px" }}>
+      <SecuritySessionPanel />
       {/* 1. Barra de Estado de Conexión y Cola Outbox */}
       <section
         aria-label="Panel de sincronización offline"
@@ -322,7 +352,7 @@ export function InspectionSyncManager() {
             <button
               type="button"
               onClick={handleSync}
-              disabled={isSyncing || !isOnline}
+              disabled={isSyncing || !isOnline || session.role==='visitor'}
               style={{
                 background: isOnline ? "var(--accent, #2563eb)" : "#94a3b8",
                 color: "#ffffff",
@@ -386,6 +416,9 @@ export function InspectionSyncManager() {
         </div>
 
         <form onSubmit={handleSaveInspection}>
+          <fieldset disabled={session.role==='visitor'} style={{border:0,padding:0}}>
+          <label htmlFor="risk-level">Nivel de riesgo (1–5)</label>
+          <input id="risk-level" type="number" min="1" max="5" step="1" required value={riskLevel} onChange={event=>setRiskLevel(Number(event.target.value))} />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px", marginBottom: "18px" }}>
             {/* Ubicación / Laboratorio con botón GPS */}
             <div>
@@ -575,6 +608,7 @@ export function InspectionSyncManager() {
           >
             💾 Guardar Inspección (Local + Outbox)
           </button>
+        </fieldset>
         </form>
       </section>
 
@@ -605,7 +639,7 @@ export function InspectionSyncManager() {
           </div>
 
           <div className="inspection-grid">
-            {localInspections.map((insp) => (
+            {localInspections.filter(insp=>canViewInspection(session,insp)).map((insp) => (
               <article className="inspection-card" key={insp.id}>
                 <div className="card-topline">
                   <span className={`badge badge-${insp.status}`}>{insp.statusLabel}</span>
@@ -616,6 +650,7 @@ export function InspectionSyncManager() {
 
                 <h3 style={{ fontSize: "15px", margin: "10px 0 6px" }}>{insp.location}</h3>
                 <p style={{ fontSize: "13px", color: "var(--muted, #475569)" }}>{insp.summary}</p>
+                {canApproveInspection(session,insp) && <button type="button" onClick={async()=>{const response=await fetch('/api/secure-inspections',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'approve',id:insp.id})});setSyncFeedback(response.ok?'Aprobación confirmada por el servidor.':'No se pudo aprobar: '+response.status);if(response.ok){const record=await response.json();setLocalInspections(items=>items.map(item=>item.id===record.id?record:item));}}}>Aprobar inspección</button>}
 
                 <dl style={{ fontSize: "12px", margin: "10px 0" }}>
                   <div>
@@ -625,6 +660,8 @@ export function InspectionSyncManager() {
                   <div>
                     <dt style={{ color: "var(--muted, #475569)" }}>Auditor</dt>
                     <dd>{insp.inspector}</dd>
+                    <dt>Riesgo</dt><dd>{insp.riskLevel}</dd>
+                    <dt>Revisión</dt><dd>{insp.approved?'Aprobada':'Pendiente'}</dd>
                   </div>
                   <div>
                     <dt style={{ color: "var(--muted, #475569)" }}>Hallazgos</dt>
