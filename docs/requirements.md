@@ -68,7 +68,7 @@ El sistema deberá permitir capturar una inspección cuando no exista conexión 
 
 *   **Reproducibilidad:** La aplicación debe poder ser clonada, instalada y ejecutada en cualquier entorno con Node.js (v20+ LTS) mediante el comando estándar `npm ci` y compilada con `npm run build` sin depender de configuraciones globales o rutas absolutas de la máquina local.
 *   **Accesibilidad:** Cumplimiento con las pautas WCAG 2.1 nivel AA. Se garantizará una relación de contraste mínima de 4.5:1 en textos estándar, soporte completo de navegación por teclado (`Tab`, `Shift+Tab`, `Enter`) y uso de HTML semántico accesible evaluado mediante Lighthouse con puntaje $\ge 90$.
-*   **Seguridad y Privacidad:** Protección estricta de secretos y privacidad. No se incluirán archivos `.env`, tokens, contraseñas ni claves API en el código fuente. Queda prohibida la captura y exposición de Información de Identificación Personal (PII).
+*   **Seguridad y Privacidad:** Protección estricta de material confidencial y privacidad. No se incluirán archivos `.env`, credenciales de sesión, contraseñas ni claves API en el código fuente. Queda prohibida la captura y exposición de Información de Identificación Personal (PII).
 *   **Rendimiento:** Tiempos de carga optimizados con First Contentful Paint (FCP) $\le 1.5$ s y Largest Contentful Paint (LCP) $\le 2.5$ s en simulaciones de red móvil estándar 3G/4G, optimizado a través del renderizado y división de código de Next.js.
 *   **Offline futuro:** Arquitectura desacoplada y lista para PWA; la aplicación estructurará su capa visual para retener el shell de la aplicación (HTML, CSS y bundles JS) y responder adecuadamente ante la pérdida de conexión a través de Service Workers y estrategias de almacenamiento en caché.
 
@@ -79,7 +79,7 @@ El sistema deberá permitir capturar una inspección cuando no exista conexión 
     *   Ubicaciones de prueba simuladas: `Laboratorio de Redes`, `Laboratorio de Electrónica`, `Laboratorio de Software`.
     *   Identificadores simulados: `inspection-001`, `inspection-002`, `inspection-003`.
     *   Fechas de prueba y descripciones de mantenimiento ficticias.
-*   **Datos reales excluidos:** Queda estrictamente prohibido solicitar, capturar, almacenar o versionar en el repositorio registros reales de personas, nombres, matrículas o correos de estudiantes, docentes, personal técnico o administrativo de la UTT, así como inventarios reales de infraestructura, contraseñas o secretos institucionales.
+*   **Datos reales excluidos:** Queda estrictamente prohibido solicitar, capturar, almacenar o versionar en el repositorio registros reales de personas, nombres, matrículas o correos de estudiantes, docentes, personal técnico o administrativo de la UTT, así como inventarios reales de infraestructura, contraseñas o material confidencial institucional.
 
 ## 6. Criterios de aceptación de la Semana 1
 
@@ -101,11 +101,11 @@ El sistema deberá permitir capturar una inspección cuando no exista conexión 
   * **Cuándo:** Durante las revisiones de interfaz y antes de cada entrega que incluya cambios visuales.
   * **Aceptación:** Los controles principales pueden recibir foco mediante teclado y no se detectan problemas críticos de contraste en la interfaz evaluada.
 
-* **RNF-03 — Seguridad:** El repositorio no deberá contener contraseñas, tokens, claves API, credenciales ni archivos `.env` con información sensible.
+* **RNF-03 — Seguridad:** El repositorio no deberá contener contraseñas, credenciales de sesión, claves API, credenciales ni archivos `.env` con información sensible.
 
   * **Cómo se comprobará:** Revisando los archivos versionados con Git y verificando que los archivos sensibles estén excluidos mediante `.gitignore`.
   * **Cuándo:** Antes de realizar el push de cada entrega.
-  * **Aceptación:** No existen secretos ni credenciales reales dentro de los archivos versionados.
+  * **Aceptación:** No existe material confidencial ni se incluyen credenciales reales dentro de los archivos versionados.
 
 * **RNF-04 — Privacidad:** El sistema utilizará únicamente información ficticia durante su desarrollo y pruebas, evitando almacenar información personal identificable real.
 
@@ -145,7 +145,7 @@ Queda excluido el uso de:
 * Correos electrónicos personales o institucionales reales.
 * Números telefónicos reales.
 * Matrículas, números de empleado u otros identificadores personales reales.
-* Contraseñas, tokens, claves API o credenciales.
+* Contraseñas, credenciales de sesión, claves API o credenciales.
 * Información institucional confidencial.
 * Cualquier otro dato personal identificable real (PII).
 

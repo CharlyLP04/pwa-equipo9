@@ -41,7 +41,7 @@ export default function InspeccionesPage() {
           <div className="section-heading">
             <div>
               <p className="eyebrow">Catálogo del servidor / datos sintéticos</p>
-              <h2 id="inspections-heading">Inspecciones del servidor</h2>
+              <h2 id="inspections-heading">Catálogo público de ejemplos sintéticos</h2>
             </div>
 
             <span className="count">{inspections.length} registros</span>
