@@ -108,3 +108,53 @@ La implementación fue revisada e integrada manualmente. Se ejecutaron las prueb
 ## Historial
 
 La evidencia completa de semanas anteriores permanece en [el historial del equipo](../docs/history/evidence-semanas-01-06.md).
+
+
+---
+
+## Semana 09 — Montalvo Osorio Alexis
+
+**Área:** Modelado de amenazas, inventario de privacidad y rastreo mínimo.
+
+**Rama:** `docs/w09-threat-privacy-alexis`
+
+**Commit SHA de aportación documental:** `06dd988a7579c336de755ae94f86eaf950f07f53`
+
+### Aportaciones individuales
+
+- Elaboración de `docs/threat-model.md`, incluyendo el escenario de una tableta extraviada con inspecciones registradas offline, las fronteras de confianza, las cinco preguntas de ingeniería y la matriz de riesgos.
+- Elaboración de `docs/privacy-data-inventory.md`, identificando los datos sintéticos, sus finalidades, almacenamiento, conservación y medidas de privacidad por diseño bajo la LGPDPPSO.
+- Creación de `public/robots.txt` con directivas para permitir la raíz pública y excluir rutas operativas e internas.
+- Revisión técnica de los controles existentes en la rama de seguridad del equipo para relacionar cada amenaza con su implementación y prueba prevista.
+
+### Decisión técnica
+
+Se decidió documentar únicamente controles comprobados mediante la inspección del código existente, diferenciando las medidas implementadas de las limitaciones y riesgos residuales.
+
+El modelo considera que el cliente no es confiable y que la identidad y los permisos deben comprobarse en el servidor. Para el inventario se distinguió entre información persistida y datos procesados temporalmente, especialmente las fotografías y coordenadas de ubicación.
+
+### Comandos y verificaciones ejecutadas
+
+- `git diff --cached --check` — PASS.
+- `git diff --cached --name-only` — PASS; únicamente los tres entregables asignados.
+- Revisión individual de los tres archivos mediante PowerShell — Sin coincidencias con los términos restringidos.
+- `git rev-parse HEAD` — SHA registrado correctamente.
+- `git status` — Working tree limpio después del commit.
+
+El comprobador público fue ejecutado, pero mostró coincidencias en archivos preexistentes de la rama base. Su mensaje final de aprobación no se consideró evidencia válida de que el repositorio completo estuviera limpio.
+
+### Limitaciones identificadas
+
+- El núcleo de seguridad de Carlos todavía está pendiente de integración.
+- La suite final `tests/security.spec.ts` corresponde a Pacheco y deberá verificarse en el commit conjunto.
+- La limpieza local no equivale a revocación remota cuando el dispositivo permanece sin conexión.
+- La persistencia del servidor corresponde a un prototipo local de un solo proceso.
+- La revisión documental no sustituye la ejecución de las pruebas negativas ni la validación del flujo completo.
+
+### Declaración de uso de IA y validación humana
+
+Se utilizó ChatGPT como apoyo para inspeccionar la arquitectura del proyecto, analizar los controles de seguridad, consultar materiales académicos y fuentes normativas, estructurar los documentos y revisar su coherencia técnica.
+
+El estudiante revisó y aprobó el contenido de los apartados, contrastó las afirmaciones con el código del proyecto, ejecutó las verificaciones locales y autorizó el commit de los entregables.
+
+La asistencia de IA no sustituye la responsabilidad del estudiante de explicar y defender las decisiones técnicas realizadas.
