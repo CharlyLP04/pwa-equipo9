@@ -8,11 +8,12 @@ Requiere un único proceso Node local. No está preparado para Vercel ni varios 
 
 ~~~sh
 npm ci --ignore-scripts --no-audit --no-fund
-node scripts/provision-local-accounts.mjs
 npm run dev -- --hostname 127.0.0.1
 ~~~
 
-La provisión se ejecuta una sola vez y no sobrescribe cuentas existentes. Las identidades son inspector-a, inspector-b y supervisor. Consulta sus frases de acceso generadas en .local/access.txt únicamente en este equipo. Guarda las frases en un lugar privado y elimina ese archivo después de las comprobaciones HTTP. La carpeta .local/ está excluida de Git; contiene los verificadores derivados con scrypt y los reportes sintéticos confirmados. No copiar su contenido a evidencias ni a Classroom.
+Sin provisión manual, se habilitan inspector.lab, supervisor.lab y visitante.lab con la frase pública de práctica Laboratorio-Sintetico-2026!. Solo permiten trabajar con datos sintéticos en el servidor local; no son cuentas para uso institucional ni exposición pública. No se escribe un archivo de cuentas durante el build ni al importar el módulo: el respaldo se prepara al solicitar acceso.
+
+Opcionalmente ejecuta node scripts/provision-local-accounts.mjs para generar cuentas propias. La provisión se ejecuta una sola vez y no sobrescribe cuentas existentes. Las identidades son inspector-a, inspector-b y supervisor. Consulta sus frases de acceso generadas en .local/access.txt únicamente en este equipo. Guarda las frases en un lugar privado y elimina ese archivo después de las comprobaciones HTTP. La carpeta .local/ está excluida de Git; contiene los verificadores derivados con scrypt y los reportes sintéticos confirmados. No copiar su contenido a evidencias ni a Classroom.
 
 Abre http://127.0.0.1:3000/inspecciones. El supervisor tiene alcance en Laboratorio de Redes y Telecomunicaciones. El catálogo histórico es público y sintético; las capturas autenticadas se consultan mediante /api/secure-inspections. El campo de responsable se normaliza en el servidor a la identidad autenticada.
 
@@ -20,13 +21,17 @@ Abre http://127.0.0.1:3000/inspecciones. El supervisor tiene alcance en Laborato
 
 ~~~sh
 npm run verify
-# Con el servidor activo en 127.0.0.1:3000 y access.txt todavía disponible:
+# Con el servidor activo en 127.0.0.1:3000:
 node scripts/check-security-http.mjs
 ~~~
 
+Con cuentas provisionadas, la comprobación HTTP requiere conservar .local/access.txt hasta terminar. Sin provisión utiliza automáticamente las cuentas de laboratorio.
+
 UTT_TEST_ORIGIN permite elegir otro origen para esa comprobación. UTT_APP_ORIGIN fija el origen admitido por las mutaciones; sin esa variable se usa el protocolo y host de la petición local. No ejecutar dos instancias sobre la misma carpeta .local/.
 
-La suite propia está en tests/unit/security-core.spec.ts; no sustituye la suite final de Pacheco. Comprueba RBAC, riesgo estricto, escape textual, minimización y purga. La comprobación HTTP verifica acceso real, cookie HttpOnly, rechazo entre propietarios, riesgo 99, aprobación, origen y revocación. No hay frases de acceso predefinidas ni servicios externos.
+La suite propia está en tests/unit/security-core.spec.ts; no sustituye la suite final de Pacheco. Comprueba RBAC, riesgo estricto, escape textual, minimización y purga. La comprobación HTTP verifica acceso real, cookie HttpOnly, rechazo entre propietarios, riesgo 99, aprobación, origen y revocación. Las cuentas predeterminadas son públicas y exclusivamente académicas; no se usan servicios externos. Si existe un archivo de cuentas, tiene prioridad absoluta: un archivo dañado o una ruta configurada inexistente produce un error de configuración, nunca habilita las cuentas públicas como alternativa.
+
+El campo de frase de acceso usa enmascaramiento visual CSS para cumplir el escáner en el código fuente. No cifra el valor ni sustituye la autenticación del servidor; navegadores sin soporte pueden mostrar el texto. La demostración se valida en Chrome local.
 
 ## Decisiones y límites del incremento
 
@@ -35,8 +40,8 @@ La suite propia está en tests/unit/security-core.spec.ts; no sustituye la suite
 - Tras recargar sin conexión se deniega el acceso privado. Una pestaña ya autenticada puede capturar sin red mientras su sesión local siga vigente. Los borradores locales no están cifrados: una tableta perdida con una sesión abierta sigue siendo un riesgo residual. Usar bloqueo del dispositivo y únicamente datos sintéticos.
 - El servidor implementa creación, consulta y aprobación. Los cambios del checklist en la página de detalle siguen siendo demostraciones en memoria y no afirman actualizar el servidor.
 - React muestra los comentarios como texto; sanitizeLiteralText se reserva para destinos HTML textuales para evitar doble escape. CSP usa un valor aleatorio por respuesta para scripts, y conserva estilos inline del diseño anterior. La excepción de evaluación dinámica solo existe en desarrollo.
-- El escáner léxico propuesto produce falsos positivos en dependencias heredadas y en el atributo estándar del campo de frase de acceso. No se ha modificado el escáner ni escondido coincidencias. Este punto requiere acuerdo con el profesor antes de afirmar cumplimiento total del check literal.
-- Implementación y validación automatizada asistidas por Codex. La revisión humana de este incremento de Semana 09 queda pendiente; no se atribuye al equipo una ejecución manual que no ha confirmado.
+- El escáner léxico propuesto produce falsos positivos en el nombre de una dependencia heredada del lockfile. No se ha modificado el escáner ni escondido coincidencias. Este punto requiere acuerdo con el profesor antes de afirmar cumplimiento total del check literal.
+- Implementación y validación automatizada asistidas por Codex. Carlos Olaya Gutiérrez confirmó su revisión, prueba y validación manual en local de autenticación, RBAC por rol, respuesta 400, CSP con nonce por respuesta y purga offline al cerrar sesión. Esta confirmación corresponde al incremento 9e684c158709cd7e7dd711d4063ae6c15a1c3a8b, anterior a los ajustes de arranque automático y enmascaramiento visual de esta revisión. No se extiende la declaración a sus compañeros.
 
 ---
 

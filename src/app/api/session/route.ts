@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     return response;
   } catch {
     return reply(
-      { error: "Acceso no disponible; provisiona las cuentas locales" },
+      { error: "Acceso no disponible; revisa la provisión local" },
       503,
     );
   }

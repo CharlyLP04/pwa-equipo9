@@ -36,6 +36,62 @@ const attempts = (state.uttAttempts ??= new Map<
 export const sessionCookie = "utt-session";
 const hash = (value: string) =>
   createHash("sha256").update(value).digest("hex");
+/** Cuentas públicas de práctica, solo cuando no existe provisión local. */
+let laboratoryAccounts: Account[] | undefined;
+export function readProvisionedAccounts(): Account[] {
+  const configured = process.env.UTT_ACCOUNTS_FILE;
+  const path = resolve(configured ?? ".local/accounts.json");
+  let raw: string;
+  try {
+    raw = readFileSync(path, "utf8");
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT" || configured)
+      throw error;
+    if (!laboratoryAccounts) {
+      laboratoryAccounts = (
+        ["inspector", "supervisor", "visitor"] as const
+      ).map((role) => {
+        const salt = randomBytes(16).toString("hex");
+        return {
+          userId: role === "visitor" ? "visitante.lab" : role + ".lab",
+          role,
+          assignedLaboratories:
+            role === "supervisor"
+              ? ["Laboratorio de Redes y Telecomunicaciones"]
+              : [],
+          salt,
+          digest: scryptSync("Laboratorio-Sintetico-2026!", salt, 64).toString(
+            "hex",
+          ),
+        };
+      });
+    }
+    return laboratoryAccounts;
+  }
+  const data: unknown = JSON.parse(raw);
+  if (
+    !Array.isArray(data) ||
+    data.length === 0 ||
+    !data.every(
+      (account) =>
+        account &&
+        typeof account.userId === "string" &&
+        account.userId.trim() &&
+        ["inspector", "supervisor", "visitor"].includes(account.role) &&
+        Array.isArray(account.assignedLaboratories) &&
+        account.assignedLaboratories.every(
+          (lab: unknown) => typeof lab === "string",
+        ) &&
+        typeof account.salt === "string" &&
+        /^[a-f0-9]{32}$/i.test(account.salt) &&
+        typeof account.digest === "string" &&
+        /^[a-f0-9]{128}$/i.test(account.digest),
+    ) ||
+    new Set(data.map((account) => account.userId)).size !== data.length
+  )
+    throw new Error("Provisión local inválida");
+  return data;
+}
 export function authenticate(userId: string, phrase: string) {
   const now = Date.now();
   for (const [key, value] of Array.from(attempts))
@@ -47,12 +103,7 @@ export function authenticate(userId: string, phrase: string) {
     count: (attempt?.count ?? 0) + 1,
     until: attempt?.until ?? now + 300000,
   });
-  const accounts = JSON.parse(
-    readFileSync(
-      resolve(process.env.UTT_ACCOUNTS_FILE ?? ".local/accounts.json"),
-      "utf8",
-    ),
-  ) as Account[];
+  const accounts = readProvisionedAccounts();
   const account = accounts.find((item) => item.userId === userId);
   const salt = account?.salt ?? "synthetic-unknown-user";
   const actual = scryptSync(phrase, salt, 64);

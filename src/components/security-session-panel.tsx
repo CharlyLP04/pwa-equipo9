@@ -19,7 +19,7 @@ export function SecuritySessionPanel() {
   const context = useSecuritySession();
   const [feedback, setFeedback] = useState("");
   const [busy, setBusy] = useState(false);
-  const [userId, setUserId] = useState("inspector-a");
+  const [userId, setUserId] = useState("inspector.lab");
   const [phrase, setPhrase] = useState("");
   useEffect(() => {
     let active = true;
@@ -142,7 +142,10 @@ export function SecuritySessionPanel() {
           <label>
             Frase de acceso{" "}
             <input
-              type="password"
+              type="text"
+              style={{ WebkitTextSecurity: "disc" } as React.CSSProperties}
+              autoCapitalize="none"
+              spellCheck={false}
               autoComplete="off"
               value={phrase}
               onChange={(e) => setPhrase(e.target.value)}
