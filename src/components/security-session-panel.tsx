@@ -90,14 +90,16 @@ export function SecuritySessionPanel() {
         storage: window.localStorage,
         sessionStorage: window.sessionStorage,
         cacheStorage: window.caches,
+        indexedDB: window.indexedDB,
       });
-      window.localStorage.setItem("utt-revocation-pending", "1");
       navigator.serviceWorker?.controller?.postMessage({
         type: "CLEAR_PRIVATE_SESSION",
       });
       localClean = true;
     } catch {
       /* La revocación remota se intenta aunque falle el almacenamiento local. */
+    } finally {
+      try { window.localStorage.setItem("utt-revocation-pending", "1"); } catch { localClean = false; }
     }
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);

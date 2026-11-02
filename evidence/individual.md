@@ -1,5 +1,25 @@
 # Evidencia individual — Semana 09
 
+## Integración y trazabilidad del Equipo 9
+
+| Integrante | Aporte | PR | Commit fuente |
+|---|---|---|---|
+| Carlos Olaya Gutiérrez | Núcleo, autenticación e integración UI | #28 | 7b575998e6c5f5065e66ec538474b43a9201d309 |
+| Montalvo Osorio Alexis | Amenazas, privacidad y rastreo | #29 | 06dd988a7579c336de755ae94f86eaf950f07f53 |
+| Pacheco Avila Carlos Alberto | Pruebas negativas y CI | #30 | d0c7930876aef441dcc50cc24c3cdf303d251026 |
+
+Los tres aportes ya están integrados en la base 6b19edf. La rama semana-09-security-privacy consolida documentación, alcance de supervisor, pruebas de permisos, borrado preventivo y verificación de artefactos. No se reemplaza la autoría de los commits fuente.
+
+## Confirmación de revisión humana conjunta
+
+Carlos Olaya Gutiérrez comunica en la solicitud de consolidación la confirmación de revisión y validación humana conjunta de Carlos Olaya Gutiérrez, Montalvo Osorio Alexis y Pacheco Avila Carlos Alberto sobre la entrega integrada. Esta declaración no se confunde con los comandos automatizados por Codex ni con una defensa ante el profesor. Las declaraciones individuales siguientes conservan el contexto de sus aportaciones originales y actualizan el estado de integración.
+
+## Verificación de la consolidación
+
+npm ci --ignore-scripts --no-audit --no-fund, npm run verify y npm test: 20/20 suites PASS; la suite de seguridad conserva 14 casos de Pacheco y suma 3, total 17/17. Los reportes locales registran SHA y estado del árbol. El workflow está incluido; la ejecución local no se presenta como una ejecución de Actions del nuevo commit. Se conserva el límite del escáner literal sobre la dependencia del lockfile, excluido únicamente en la comprobación específica solicitada.
+
+También se verificó el build de producción por HTTP y Chrome: creación del supervisor fuera de alcance rechazada, borrado real de pwa_offline_db, aviso ante bloqueo y revocación al reconectar. El escaneo solicitado excluye public-tests/check.sh y package-lock.json y devuelve cero coincidencias.
+
 ## Carlos Olaya Gutiérrez — núcleo de seguridad e integración
 
 - Commit del incremento revisado: 9e684c158709cd7e7dd711d4063ae6c15a1c3a8b, rama feat/w09-security-core-carlos.
@@ -9,6 +29,103 @@
 - Comprobación automatizada de los ajustes posteriores: npm ci, npm run build y npm test (19/19 suites); acceso HTTP y navegador Chrome sobre el build de producción sin archivo de cuentas, enmascaramiento visual, purga offline y revocación al reconectar. El archivo de cuentas previo se restauró al terminar.
 - Limitaciones: servidor de un solo proceso, datos sintéticos, borradores sin cifrado y revocación remota diferida cuando no existe conexión. El escáner literal detecta el nombre de una dependencia del lockfile, sin que eso implique una credencial expuesta.
 - Uso declarado de IA: OpenAI Codex asistió en implementación, pruebas y documentación. Carlos revisó y validó personalmente el incremento señalado. Los ajustes posteriores de cuentas predeterminadas y enmascaramiento visual tienen comprobación automatizada; esta nota no anticipa una nueva validación manual.
+
+
+## Semana 09 — Montalvo Osorio Alexis
+
+**Área:** Modelado de amenazas, inventario de privacidad y rastreo mínimo.
+
+**Rama:** `docs/w09-threat-privacy-alexis`
+
+**Commit SHA de aportación documental:** `06dd988a7579c336de755ae94f86eaf950f07f53`
+
+### Aportaciones individuales
+
+- Elaboración de `docs/threat-model.md`, incluyendo el escenario de una tableta extraviada con inspecciones registradas offline, las fronteras de confianza, las cinco preguntas de ingeniería y la matriz de riesgos.
+- Elaboración de `docs/privacy-data-inventory.md`, identificando los datos sintéticos, sus finalidades, almacenamiento, conservación y medidas de privacidad por diseño bajo la LGPDPPSO.
+- Creación de `public/robots.txt` con directivas para permitir la raíz pública y excluir rutas operativas e internas.
+- Revisión técnica de los controles existentes en la rama de seguridad del equipo para relacionar cada amenaza con su implementación y prueba prevista.
+
+### Decisión técnica
+
+Se decidió documentar únicamente controles comprobados mediante la inspección del código existente, diferenciando las medidas implementadas de las limitaciones y riesgos residuales.
+
+El modelo considera que el cliente no es confiable y que la identidad y los permisos deben comprobarse en el servidor. Para el inventario se distinguió entre información persistida y datos procesados temporalmente, especialmente las fotografías y coordenadas de ubicación.
+
+### Comandos y verificaciones ejecutadas
+
+- `git diff --cached --check` — PASS.
+- `git diff --cached --name-only` — PASS; únicamente los tres entregables asignados.
+- Revisión individual de los tres archivos mediante PowerShell — Sin coincidencias con los términos restringidos.
+- `git rev-parse HEAD` — SHA registrado correctamente.
+- `git status` — Working tree limpio después del commit.
+
+El comprobador público fue ejecutado, pero mostró coincidencias en archivos preexistentes de la rama base. Su mensaje final de aprobación no se consideró evidencia válida de que el repositorio completo estuviera limpio.
+
+### Limitaciones identificadas
+
+- El núcleo de Carlos está integrado desde el PR #28; esta consolidación corrige además la creación del supervisor fuera de su laboratorio.
+- La suite de Pacheco está integrada y se ejecuta con el conjunto de 20 suites; se conservan sus 14 verificaciones y se añaden tres regresiones.
+- La limpieza local no equivale a revocación remota cuando el dispositivo permanece sin conexión.
+- La persistencia del servidor corresponde a un prototipo local de un solo proceso.
+- La revisión documental no sustituye la ejecución de las pruebas negativas ni la validación del flujo completo.
+
+### Declaración de uso de IA y validación humana
+
+Se utilizó ChatGPT como apoyo para inspeccionar la arquitectura del proyecto, analizar los controles de seguridad, consultar materiales académicos y fuentes normativas, estructurar los documentos y revisar su coherencia técnica.
+
+El estudiante revisó y aprobó el contenido de los apartados, contrastó las afirmaciones con el código del proyecto, ejecutó las verificaciones locales y autorizó el commit de los entregables.
+
+La asistencia de IA no sustituye la responsabilidad del estudiante de explicar y defender las decisiones técnicas realizadas.
+
+
+
+## Semana 09 — Pacheco Avila Carlos Alberto
+
+**Área:** Pruebas negativas de seguridad e integración continua.
+
+**Rama:** `test/w09-security-ci-pacheco`
+
+**Commit individual:** `d0c7930876aef441dcc50cc24c3cdf303d251026`.
+
+### Aportaciones
+
+- Creación de tests/security.spec.ts con 14 verificaciones.
+- Pruebas de control de acceso por propietario, rol y laboratorio asignado.
+- Pruebas de rechazo de niveles de riesgo y cantidades de hallazgos inválidos.
+- Comprobación de limpieza de almacenamiento privado, cachés y cola de operaciones.
+- Verificación del escape de contenido HTML y las restricciones CSP.
+- Comprobación de documentación de amenazas, inventario de privacidad y robots.txt.
+- Pruebas de contingencia para cámara y ubicación sin capacidades disponibles.
+- Incorporación del workflow oficial de Semana 09.
+
+### Decisión técnica
+
+Se eligieron pruebas deterministas mediante funciones reales del proyecto y adaptadores en memoria para comprobar comportamientos negativos sin depender de infraestructura externa.
+
+Se mantuvieron las implementaciones de seguridad del equipo sin alterarlas.
+
+### Verificaciones realizadas
+
+- npx.cmd tsx tests/security.spec.ts — PASS, 14 verificaciones.
+- npm.cmd test — PASS, 20 de 20 suites.
+- npm.cmd run typecheck — PASS.
+- npm.cmd run verify — PASS.
+- Compilación de producción — PASS.
+
+### Limitaciones
+
+La consolidación añade simulación explícita de cámara y ubicación denegadas, restaurando navigator y window en finally. Las 14 verificaciones de la aportación original se conservan; la suite consolidada tiene 17.
+
+La limpieza local de datos no demuestra revocación remota inmediata durante una desconexión.
+
+El workflow de Semana 09 está integrado; los resultados locales se registran con su SHA. Una ejecución de Actions solo acredita el SHA que efectivamente ejecutó. Las comprobaciones privadas no son observables por el equipo.
+
+### Uso de inteligencia artificial
+
+Se utilizó ChatGPT de OpenAI para apoyar el diseño de escenarios negativos, la estructuración de pruebas TypeScript y la documentación técnica.
+
+El estudiante revisó los cambios, ejecutó los comandos de verificación en su equipo y comprobó los resultados obtenidos. La revisión humana conjunta de la entrega integrada queda registrada en la confirmación inicial de este documento. Los ajustes de consolidación cuentan con verificación automatizada local; no se afirma una ejecución remota para un commit no publicado.
 
 ---
 
@@ -108,103 +225,3 @@ La implementación fue revisada e integrada manualmente. Se ejecutaron las prueb
 ## Historial
 
 La evidencia completa de semanas anteriores permanece en [el historial del equipo](../docs/history/evidence-semanas-01-06.md).
-
-
----
-
-## Semana 09 — Montalvo Osorio Alexis
-
-**Área:** Modelado de amenazas, inventario de privacidad y rastreo mínimo.
-
-**Rama:** `docs/w09-threat-privacy-alexis`
-
-**Commit SHA de aportación documental:** `06dd988a7579c336de755ae94f86eaf950f07f53`
-
-### Aportaciones individuales
-
-- Elaboración de `docs/threat-model.md`, incluyendo el escenario de una tableta extraviada con inspecciones registradas offline, las fronteras de confianza, las cinco preguntas de ingeniería y la matriz de riesgos.
-- Elaboración de `docs/privacy-data-inventory.md`, identificando los datos sintéticos, sus finalidades, almacenamiento, conservación y medidas de privacidad por diseño bajo la LGPDPPSO.
-- Creación de `public/robots.txt` con directivas para permitir la raíz pública y excluir rutas operativas e internas.
-- Revisión técnica de los controles existentes en la rama de seguridad del equipo para relacionar cada amenaza con su implementación y prueba prevista.
-
-### Decisión técnica
-
-Se decidió documentar únicamente controles comprobados mediante la inspección del código existente, diferenciando las medidas implementadas de las limitaciones y riesgos residuales.
-
-El modelo considera que el cliente no es confiable y que la identidad y los permisos deben comprobarse en el servidor. Para el inventario se distinguió entre información persistida y datos procesados temporalmente, especialmente las fotografías y coordenadas de ubicación.
-
-### Comandos y verificaciones ejecutadas
-
-- `git diff --cached --check` — PASS.
-- `git diff --cached --name-only` — PASS; únicamente los tres entregables asignados.
-- Revisión individual de los tres archivos mediante PowerShell — Sin coincidencias con los términos restringidos.
-- `git rev-parse HEAD` — SHA registrado correctamente.
-- `git status` — Working tree limpio después del commit.
-
-El comprobador público fue ejecutado, pero mostró coincidencias en archivos preexistentes de la rama base. Su mensaje final de aprobación no se consideró evidencia válida de que el repositorio completo estuviera limpio.
-
-### Limitaciones identificadas
-
-- El núcleo de seguridad de Carlos todavía está pendiente de integración.
-- La suite final `tests/security.spec.ts` corresponde a Pacheco y deberá verificarse en el commit conjunto.
-- La limpieza local no equivale a revocación remota cuando el dispositivo permanece sin conexión.
-- La persistencia del servidor corresponde a un prototipo local de un solo proceso.
-- La revisión documental no sustituye la ejecución de las pruebas negativas ni la validación del flujo completo.
-
-### Declaración de uso de IA y validación humana
-
-Se utilizó ChatGPT como apoyo para inspeccionar la arquitectura del proyecto, analizar los controles de seguridad, consultar materiales académicos y fuentes normativas, estructurar los documentos y revisar su coherencia técnica.
-
-El estudiante revisó y aprobó el contenido de los apartados, contrastó las afirmaciones con el código del proyecto, ejecutó las verificaciones locales y autorizó el commit de los entregables.
-
-La asistencia de IA no sustituye la responsabilidad del estudiante de explicar y defender las decisiones técnicas realizadas.
-
-
----
-
-## Semana 09 — Pacheco Avila Carlos Alberto
-
-**Área:** Pruebas negativas de seguridad e integración continua.
-
-**Rama:** `test/w09-security-ci-pacheco`
-
-**Commit individual:** `d0c7930876aef441dcc50cc24c3cdf303d251026`.
-
-### Aportaciones
-
-- Creación de tests/security.spec.ts con 14 verificaciones.
-- Pruebas de control de acceso por propietario, rol y laboratorio asignado.
-- Pruebas de rechazo de niveles de riesgo y cantidades de hallazgos inválidos.
-- Comprobación de limpieza de almacenamiento privado, cachés y cola de operaciones.
-- Verificación del escape de contenido HTML y las restricciones CSP.
-- Comprobación de documentación de amenazas, inventario de privacidad y robots.txt.
-- Pruebas de contingencia para cámara y ubicación sin capacidades disponibles.
-- Incorporación del workflow oficial de Semana 09.
-
-### Decisión técnica
-
-Se eligieron pruebas deterministas mediante funciones reales del proyecto y adaptadores en memoria para comprobar comportamientos negativos sin depender de infraestructura externa.
-
-Se mantuvieron las implementaciones de seguridad del equipo sin alterarlas.
-
-### Verificaciones realizadas
-
-- npx.cmd tsx tests/security.spec.ts — PASS, 14 verificaciones.
-- npm.cmd test — PASS, 20 de 20 suites.
-- npm.cmd run typecheck — PASS.
-- npm.cmd run verify — PASS.
-- Compilación de producción — PASS.
-
-### Limitaciones
-
-Las pruebas de contingencia no simulan todavía el rechazo explícito de permisos por parte del navegador.
-
-La limpieza local de datos no demuestra revocación remota inmediata durante una desconexión.
-
-El workflow de GitHub Actions y las comprobaciones privadas requieren validación adicional.
-
-### Uso de inteligencia artificial
-
-Se utilizó ChatGPT de OpenAI para apoyar el diseño de escenarios negativos, la estructuración de pruebas TypeScript y la documentación técnica.
-
-El estudiante revisó los cambios, ejecutó los comandos de verificación en su equipo y comprobó los resultados obtenidos. La validación final del workflow y la revisión de los cambios pendientes se realizarán antes de la entrega.

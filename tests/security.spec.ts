@@ -79,7 +79,7 @@ async function main() {
         ...report,
         laboratoryTag: "LAB-B",
       }).status,
-      403
+      403,
     );
   });
 
@@ -123,9 +123,7 @@ async function main() {
       ["public-theme", "light"],
     ]);
 
-    const session = new Map([
-      ["utt-active-session", "sesion-sintetica"],
-    ]);
+    const session = new Map([["utt-active-session", "sesion-sintetica"]]);
 
     const caches = new Map([
       ["utt-lab-private-cache", "reporte sintético"],
@@ -208,7 +206,6 @@ async function main() {
     }
   });
 
-
   // 07. Recuperación ante permisos denegados
 
   await check("Cámara denegada permite evidencia sintética", async () => {
@@ -222,17 +219,123 @@ async function main() {
     assert.ok(result.photoDataUri?.startsWith("data:image/"));
   });
 
-  await check("Ubicación denegada permite seleccionar laboratorio", async () => {
-    const result = await getLocationWithFallback("LAB-A", {
-      allowManualFallback: true,
-    });
+  await check(
+    "Ubicación denegada permite seleccionar laboratorio",
+    async () => {
+      const result = await getLocationWithFallback("LAB-A", {
+        allowManualFallback: true,
+      });
 
-    assert.equal(result.success, true);
-    assert.equal(result.fallbackUsed, true);
-    assert.ok(result.laboratoryTag.length > 0);
+      assert.equal(result.success, true);
+      assert.equal(result.fallbackUsed, true);
+      assert.ok(result.laboratoryTag.length > 0);
+    },
+  );
+
+  await check("Supervisor no crea fuera de su laboratorio", () => {
+    assert.equal(
+      authorizeAction(supervisor, "create", {
+        ownerId: supervisor.userId,
+        laboratoryTag: "LAB-B",
+      }).status,
+      403,
+    );
+    assert.equal(
+      authorizeAction(supervisor, "create", {
+        ownerId: supervisor.userId,
+        laboratoryTag: "LAB-A",
+      }).status,
+      200,
+    );
+    assert.equal(
+      authorizeAction(supervisor, "create", {
+        ownerId: inspectorA.userId,
+        laboratoryTag: "LAB-A",
+      }).status,
+      403,
+    );
   });
-
-
+  const originalNavigator = Object.getOwnPropertyDescriptor(
+    globalThis,
+    "navigator",
+  );
+  const originalWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+  try {
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      value: {},
+    });
+    let cameraCalls = 0;
+    let locationCalls = 0;
+    Object.defineProperty(globalThis, "navigator", {
+      configurable: true,
+      value: {
+        mediaDevices: {
+          getUserMedia: async () => {
+            cameraCalls++;
+            throw Object.assign(new Error("Permiso denegado"), {
+              name: "NotAllowedError",
+            });
+          },
+        },
+        geolocation: {
+          getCurrentPosition: (
+            _success: unknown,
+            failure: (error: {
+              code: number;
+              message: string;
+              PERMISSION_DENIED: number;
+              POSITION_UNAVAILABLE: number;
+              TIMEOUT: number;
+            }) => void,
+          ) => {
+            locationCalls++;
+            failure({
+              code: 1,
+              PERMISSION_DENIED: 1,
+              POSITION_UNAVAILABLE: 2,
+              TIMEOUT: 3,
+              message: "Permiso denegado",
+            });
+          },
+        },
+      },
+    });
+    await check(
+      "Rechazo explícito de cámara conserva flujo sintético",
+      async () => {
+        const result = await captureWithFallback({
+          allowSyntheticFallback: true,
+          syntheticInspectionId: "INSP-DENIED-09",
+        });
+        assert.equal(cameraCalls, 1);
+        assert.equal(result.success, true);
+        assert.equal(result.fallbackUsed, true);
+        assert.equal(result.fallbackReason, "permission_denied");
+        assert.ok(result.photoDataUri?.startsWith("data:image/"));
+      },
+    );
+    await check(
+      "Rechazo explícito de ubicación conserva laboratorio manual",
+      async () => {
+        const result = await getLocationWithFallback("LAB-A", {
+          allowManualFallback: true,
+        });
+        assert.equal(locationCalls, 1);
+        assert.equal(result.success, true);
+        assert.equal(result.fallbackUsed, true);
+        assert.equal(result.fallbackReason, "permission_denied");
+        assert.ok(result.laboratoryTag.length > 0);
+      },
+    );
+  } finally {
+    if (originalNavigator)
+      Object.defineProperty(globalThis, "navigator", originalNavigator);
+    else Reflect.deleteProperty(globalThis, "navigator");
+    if (originalWindow)
+      Object.defineProperty(globalThis, "window", originalWindow);
+    else Reflect.deleteProperty(globalThis, "window");
+  }
   console.log(`security.spec.ts: PASS (${checks} verificaciones)`);
 }
 

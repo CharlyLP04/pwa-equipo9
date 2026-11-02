@@ -82,7 +82,7 @@ La siguiente tabla identifica los datos, su finalidad, el flujo dentro de la apl
 | Memoria de React | Evidencia fotográfica y resultados temporales de ubicación | Reiniciar los estados al guardar o cambiar de sesión |
 | Memoria del servidor | Contextos de sesión y registros cargados | Revocar sesiones y limitar el alcance de las consultas |
 | Persistencia local del servidor | Reportes de prueba en `.local/inspections.json` | Mantener únicamente datos sintéticos y realizar limpieza controlada al terminar la actividad |
-| IndexedDB | No se identificó uso en el flujo de inspecciones revisado | No afirmar que almacena reportes ni que existe una rutina de limpieza para esta superficie |
+| IndexedDB | Base pwa_offline_db contemplada preventivamente; las inspecciones y outbox activas usan localStorage | security-session-panel.tsx invoca la limpieza y espera indexedDB.deleteDatabase("pwa_offline_db"); bloqueos o errores producen aviso de limpieza incompleta |
 
 ## 5. Principios de privacidad por diseño
 
@@ -173,7 +173,7 @@ La eliminación local no equivale a la eliminación automática de los registros
 
 5. Las coordenadas obtenidas por la Geolocation API pueden ser reales. Debe utilizarse selección sintética o manual y evitar conservar la ubicación precisa.
 
-6. No se identificó persistencia mediante IndexedDB en los módulos revisados. Si se incorpora en el futuro, deberá documentarse su contenido y añadirse un procedimiento de eliminación.
+6. La persistencia activa usa localStorage: utt-local-inspections y utt-lab-outbox. IndexedDB no almacena las inspecciones del flujo actual; se elimina preventivamente pwa_offline_db al cerrar sesión. Si otra pestaña bloquea el borrado, se informa limpieza incompleta.
 
 7. La validación de entradas no garantiza por sí sola la detección de información personal real. Se necesita mantener la prohibición de captura de dichos datos y realizar revisión humana.
 
