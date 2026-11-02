@@ -102,3 +102,42 @@ Carlos confirmó la revisión del código, los resultados y las aportaciones por
 ## Documentación acumulada
 
 Se conserva completo el [README de semanas anteriores](docs/history/readme-semanas-01-06.md), la [evidencia histórica](docs/history/evidence-semanas-01-06.md) y la [estrategia original de Alexis](docs/history/w08-alexis-strategy.md). Los comandos antiguos se presentan como historia; prevalecen los de esta página.
+
+
+
+
+---
+
+## Semana 09 — Seguridad y privacidad
+
+### Pruebas implementadas
+
+Se incorporó `tests/security.spec.ts` para comprobar el control de acceso por roles (RBAC), la validación de entradas, la limpieza de datos privados al cerrar sesión, la protección frente a contenido HTML y las restricciones de Content Security Policy (CSP).
+
+La suite contiene 14 verificaciones con datos sintéticos y sin dependencias de servicios externos.
+
+### Ejecución de pruebas
+
+```sh
+npx tsx tests/security.spec.ts
+npm test
+npm run typecheck
+npm run verify
+```
+
+### Resultados
+
+- 14/14 verificaciones de seguridad aprobadas.
+- 20/20 suites generales aprobadas.
+- TypeScript sin errores.
+- Compilación de producción y verificación general satisfactorias.
+
+### Integración continua
+
+Se incorporó el workflow oficial `.github/workflows/week-09-w09-security-privacy.yml`, que verifica instalación, compilación, existencia de entregables y ejecución de pruebas.
+
+### Limitaciones
+
+Las pruebas de contingencia verifican el comportamiento cuando no están disponibles las capacidades de cámara y ubicación. La simulación explícita de permisos denegados todavía está pendiente.
+
+La ejecución local no sustituye la evaluación del workflow en GitHub Actions.

@@ -158,3 +158,53 @@ Se utilizó ChatGPT como apoyo para inspeccionar la arquitectura del proyecto, a
 El estudiante revisó y aprobó el contenido de los apartados, contrastó las afirmaciones con el código del proyecto, ejecutó las verificaciones locales y autorizó el commit de los entregables.
 
 La asistencia de IA no sustituye la responsabilidad del estudiante de explicar y defender las decisiones técnicas realizadas.
+
+
+---
+
+## Semana 09 — Pacheco Avila Carlos Alberto
+
+**Área:** Pruebas negativas de seguridad e integración continua.
+
+**Rama:** `test/w09-security-ci-pacheco`
+
+**Commit individual:** `d0c7930876aef441dcc50cc24c3cdf303d251026`.
+
+### Aportaciones
+
+- Creación de tests/security.spec.ts con 14 verificaciones.
+- Pruebas de control de acceso por propietario, rol y laboratorio asignado.
+- Pruebas de rechazo de niveles de riesgo y cantidades de hallazgos inválidos.
+- Comprobación de limpieza de almacenamiento privado, cachés y cola de operaciones.
+- Verificación del escape de contenido HTML y las restricciones CSP.
+- Comprobación de documentación de amenazas, inventario de privacidad y robots.txt.
+- Pruebas de contingencia para cámara y ubicación sin capacidades disponibles.
+- Incorporación del workflow oficial de Semana 09.
+
+### Decisión técnica
+
+Se eligieron pruebas deterministas mediante funciones reales del proyecto y adaptadores en memoria para comprobar comportamientos negativos sin depender de infraestructura externa.
+
+Se mantuvieron las implementaciones de seguridad del equipo sin alterarlas.
+
+### Verificaciones realizadas
+
+- npx.cmd tsx tests/security.spec.ts — PASS, 14 verificaciones.
+- npm.cmd test — PASS, 20 de 20 suites.
+- npm.cmd run typecheck — PASS.
+- npm.cmd run verify — PASS.
+- Compilación de producción — PASS.
+
+### Limitaciones
+
+Las pruebas de contingencia no simulan todavía el rechazo explícito de permisos por parte del navegador.
+
+La limpieza local de datos no demuestra revocación remota inmediata durante una desconexión.
+
+El workflow de GitHub Actions y las comprobaciones privadas requieren validación adicional.
+
+### Uso de inteligencia artificial
+
+Se utilizó ChatGPT de OpenAI para apoyar el diseño de escenarios negativos, la estructuración de pruebas TypeScript y la documentación técnica.
+
+El estudiante revisó los cambios, ejecutó los comandos de verificación en su equipo y comprobó los resultados obtenidos. La validación final del workflow y la revisión de los cambios pendientes se realizarán antes de la entrega.
