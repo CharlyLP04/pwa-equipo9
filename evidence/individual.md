@@ -168,7 +168,7 @@ La asistencia de IA no sustituye la responsabilidad del estudiante de explicar y
 
 **Rama:** `test/w09-security-ci-pacheco`
 
-**Commit individual:** Pendiente de generar al finalizar las verificaciones.
+**Commit individual:** `d0c7930876aef441dcc50cc24c3cdf303d251026`.
 
 ### Aportaciones
 
