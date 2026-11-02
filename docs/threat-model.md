@@ -38,7 +38,7 @@ Aunque el Service Worker evita recuperar información privada desde la caché cu
 - El cliente se considera una superficie potencialmente manipulable.
 - Los controles de seguridad deben comprobarse en el servidor y no depender únicamente de la interfaz.
 - La implementación revisada utiliza persistencia local del servidor y un único proceso Node.js.
-- El análisis corresponde al incremento de seguridad preparado por el equipo y deberá verificarse nuevamente en el commit de integración final.
+- El análisis corresponde al código integrado de los PR #28, #29 y #30 y a su consolidación en semana-09-security-privacy.
 
 El objetivo es identificar los riesgos, relacionarlos con controles técnicos existentes y establecer pruebas negativas que permitan comprobar su eficacia.
 
@@ -61,8 +61,8 @@ La arquitectura se divide en tres zonas: dispositivo, API y persistencia de dato
 │  - Recursos públicos y cachés utt-lab-*                     │
 │                                                             │
 │  IndexedDB                                                  │
-│  - Superficie contemplada para el análisis                  │
-│  - No se identificó uso en el flujo revisado                │
+│  - pwa_offline_db: borrado preventivo                        │
+│  - Persistencia activa en localStorage                     │
 │                                                             │
 │  EL CLIENTE NO ES CONFIABLE                                 │
 └───────────────────────────┬─────────────────────────────────┘
@@ -95,6 +95,7 @@ La arquitectura se divide en tres zonas: dispositivo, API y persistencia de dato
 │  No corresponde a una base de datos administrada.           │
 └─────────────────────────────────────────────────────────────┘
 
+```
 
 ## 3. Las cinco preguntas de ingeniería
 
@@ -140,7 +141,7 @@ La identidad se obtiene del contexto de sesión validado por el servidor. El rol
 
 El cliente no tiene autoridad para concederse permisos ni modificar su rol mediante los datos enviados en una solicitud.
 
-**Nota de implementación:** el módulo actual permite al supervisor crear una inspección cuando el propietario coincide con su identidad. La comprobación del laboratorio asignado se aplica a las operaciones de consulta, actualización y aprobación. Esta diferencia se considera una limitación que debe revisarse en la integración.
+**Nota de implementación:** el inspector crea, consulta y actualiza únicamente reportes propios y no aprueba. El supervisor crea únicamente reportes propios dentro del laboratorio asignado; consulta, actualiza y aprueba reportes dentro de su alcance, incluso cuando pertenecen a otro inspector. El visitante no accede a operaciones protegidas.
 
 
 ### 3.3 ¿Qué podría pasar?
@@ -230,7 +231,7 @@ El módulo RBAC aplica los siguientes criterios:
 
 - El inspector puede crear y consultar o actualizar sus propios reportes.
 - El inspector no puede aprobar inspecciones.
-- El supervisor puede consultar, actualizar y aprobar reportes dentro de sus laboratorios asignados.
+- El supervisor crea reportes propios y consulta, actualiza y aprueba reportes dentro de sus laboratorios asignados.
 - El visitante no puede ejecutar operaciones protegidas.
 
 #### Protección del contenido
@@ -242,6 +243,8 @@ React también escapa los valores dinámicos representados mediante JSX. La pol�
 La política permite estilos en línea y una excepción de evaluación dinámica únicamente durante el desarrollo. Estas decisiones representan límites que deben considerarse en la evaluación del endurecimiento de la política.
 
 #### Protección del almacenamiento
+
+El componente security-session-panel.tsx también solicita el borrado preventivo de pwa_offline_db en IndexedDB y espera su resultado.
 
 Durante el cierre de sesión se eliminan las claves que comienzan con `utt-` de `localStorage` y `sessionStorage`, así como las cachés administradas cuyo nombre comienza con `utt-lab-`.
 
@@ -271,7 +274,7 @@ Esta configuración reduce la exposición accidental ante rastreadores respetuos
 
 Los controles deben comprobarse mediante pruebas negativas reproducibles con datos exclusivamente sintéticos.
 
-La suite asignada a Pacheco es `tests/security.spec.ts`. Los siguientes escenarios establecen los resultados que deberán verificarse cuando la suite y los controles se encuentren integrados.
+La suite de Pacheco `tests/security.spec.ts` está integrada. Conserva sus 14 verificaciones originales y añade tres: creación del supervisor fuera de alcance y rechazo explícito de permisos de cámara y ubicación, con restauración del entorno simulado.
 
 | ID | Preparación y acción | Resultado esperado | Control relacionado |
 |---|---|---|---|
@@ -288,7 +291,7 @@ La suite asignada a Pacheco es `tests/security.spec.ts`. Los siguientes escenari
 
 **Criterio de aceptación:** cada prueba debe utilizar una entrada conocida, ejecutar el comportamiento real del control y comprobar un resultado observable. No se considera suficiente que una prueba solamente invoque una función sin verificar su resultado.
 
-Los resultados deberán documentarse con el comando ejecutado y la salida real. No se declara ninguna prueba como aprobada hasta que se ejecute sobre el commit correspondiente.
+La ejecución se registra en test-results/results.json y test-results/verification.json con SHA y estado del árbol. La suite del núcleo comprueba también minimización y borrado preventivo de IndexedDB.
 
 ---
 
@@ -333,9 +336,9 @@ Los controles reducen la exposición, pero no eliminan todos los riesgos.
 
 8. **Rastreo:** `robots.txt` comunica instrucciones a los rastreadores, pero no impide que una persona solicite directamente una ruta. La protección efectiva depende de los controles de acceso de la API.
 
-9. **Almacenamiento adicional:** no se identificó uso de IndexedDB en el flujo revisado. Si posteriormente se incorpora, deberá añadirse una rutina de limpieza y una prueba específica.
+9. **Almacenamiento adicional:** la persistencia activa usa localStorage (utt-local-inspections y utt-lab-outbox). El cierre de sesión invoca preventivamente indexedDB.deleteDatabase("pwa_offline_db") mediante session-cleanup.ts; un bloqueo o error impide anunciar limpieza completa. No se afirma que el flujo actual almacene inspecciones en esa base.
 
-10. **Alcance de evaluación:** los resultados de las pruebas deben volver a comprobarse en el commit integrado, debido a que los cambios del núcleo de seguridad, los artefactos documentales y la suite final pertenecen a ramas diferentes.
+10. **Alcance de evaluación:** núcleo, documentos y pruebas están integrados. Los resultados locales no predicen la evaluación privada del profesor ni sustituyen una ejecución de Actions del SHA que se entregue.
 
 ### Conclusión
 

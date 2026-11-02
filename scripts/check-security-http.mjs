@@ -99,6 +99,21 @@ async function login(userId) {
     ).status,
     409,
   );
+  assert.equal(
+    (
+      await request("/api/secure-inspections", "POST", s, {
+        ...operation,
+        operationId: operation.operationId + "-supervisor-outside",
+        payload: {
+          ...payload,
+          id: payload.id + "-supervisor-outside",
+          ownerId: supervisor,
+          location: "Laboratorio fuera de alcance",
+        },
+      })
+    ).status,
+    403,
+  );
   const outside = {
     ...operation,
     operationId: operation.operationId + "-outside",

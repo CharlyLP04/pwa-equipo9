@@ -135,6 +135,29 @@ async function verifyAutomaticAccounts() {
 }
 async function run() {
   await verifyAutomaticAccounts();
+  for (const outcome of ["onsuccess", "onblocked", "onerror"] as const) {
+    const request = {} as IDBOpenDBRequest;
+    let deleted = "";
+    const operation = clearPrivateSessionStorage({
+      indexedDB: {
+        deleteDatabase(name) {
+          deleted = name;
+          queueMicrotask(() => {
+            const handler = request[outcome];
+            if (handler)
+              handler.call(
+                request,
+                new Event(outcome) as IDBVersionChangeEvent,
+              );
+          });
+          return request;
+        },
+      },
+    });
+    if (outcome === "onsuccess") await operation;
+    else await assert.rejects(operation, /IndexedDB/);
+    assert.equal(deleted, "pwa_offline_db");
+  }
   const data = new Map([
     ["utt-local-inspections", "private"],
     ["utt-lab-outbox", "private"],

@@ -1,6 +1,12 @@
-# Semana 09 — núcleo de Carlos en desarrollo local
+# PWA de inspecciones — entrega Semana 09
 
-La autenticación es real y usa cuentas sintéticas; los roles proceden del servidor, no de un selector del navegador. Este incremento se mantiene en la rama feat/w09-security-core-carlos. Los documentos finales de amenazas e inventario corresponden a Alexis; tests/security.spec.ts y la consolidación de CI quedan para la coordinación con Pacheco. La sección histórica de Semana 08 se conserva más abajo.
+Equipo 9: integración de los PR #28, #29 y #30, incorporados en origin/main 6b19edf. Esta consolidación se realiza en semana-09-security-privacy y conserva la autoría y el historial de los tres integrantes. Datos exclusivamente sintéticos y servidor Node local.
+
+| Integrante | Aporte | PR | Commit fuente |
+|---|---|---|---|
+| Carlos Olaya Gutiérrez | Núcleo, autenticación e integración UI | #28 | 7b575998e6c5f5065e66ec538474b43a9201d309 |
+| Montalvo Osorio Alexis | Amenazas, privacidad y rastreo | #29 | 06dd988a7579c336de755ae94f86eaf950f07f53 |
+| Pacheco Avila Carlos Alberto | Pruebas negativas y CI | #30 | d0c7930876aef441dcc50cc24c3cdf303d251026 |
 
 ## Arranque de Semana 09
 
@@ -17,10 +23,11 @@ Opcionalmente ejecuta node scripts/provision-local-accounts.mjs para generar cue
 
 Abre http://127.0.0.1:3000/inspecciones. El supervisor tiene alcance en Laboratorio de Redes y Telecomunicaciones. El catálogo histórico es público y sintético; las capturas autenticadas se consultan mediante /api/secure-inspections. El campo de responsable se normaliza en el servidor a la identidad autenticada.
 
-## Comprobaciones del núcleo
+## Verificación consolidada
 
 ~~~sh
 npm run verify
+npm test
 # Con el servidor activo en 127.0.0.1:3000:
 node scripts/check-security-http.mjs
 ~~~
@@ -29,21 +36,31 @@ Con cuentas provisionadas, la comprobación HTTP requiere conservar .local/acces
 
 UTT_TEST_ORIGIN permite elegir otro origen para esa comprobación. UTT_APP_ORIGIN fija el origen admitido por las mutaciones; sin esa variable se usa el protocolo y host de la petición local. No ejecutar dos instancias sobre la misma carpeta .local/.
 
-La suite propia está en tests/unit/security-core.spec.ts; no sustituye la suite final de Pacheco. Comprueba RBAC, riesgo estricto, escape textual, minimización y purga. La comprobación HTTP verifica acceso real, cookie HttpOnly, rechazo entre propietarios, riesgo 99, aprobación, origen y revocación. Las cuentas predeterminadas son públicas y exclusivamente académicas; no se usan servicios externos. Si existe un archivo de cuentas, tiene prioridad absoluta: un archivo dañado o una ruta configurada inexistente produce un error de configuración, nunca habilita las cuentas públicas como alternativa.
+La suite tests/unit/security-core.spec.ts complementa tests/security.spec.ts de Pacheco, con sus 14 verificaciones originales y tres regresiones adicionales (17 en total). Comprueba RBAC, riesgo estricto, escape textual, minimización y purga. La comprobación HTTP verifica acceso real, cookie HttpOnly, rechazo entre propietarios, riesgo 99, aprobación, origen y revocación. Las cuentas predeterminadas son públicas y exclusivamente académicas; no se usan servicios externos. Si existe un archivo de cuentas, tiene prioridad absoluta: un archivo dañado o una ruta configurada inexistente produce un error de configuración, nunca habilita las cuentas públicas como alternativa.
 
 El campo de frase de acceso usa enmascaramiento visual CSS para cumplir el escáner en el código fuente. No cifra el valor ni sustituye la autenticación del servidor; navegadores sin soporte pueden mostrar el texto. La demostración se valida en Chrome local.
 
 ## Decisiones y límites del incremento
 
 - La sesión dura 30 minutos; el identificador aleatorio se transporta en cookie HttpOnly y SameSite=Strict. Secure se activa con HTTPS. Reiniciar Node invalida las sesiones; los reportes se conservan en disco mediante reemplazo del archivo completo.
-- Cerrar sesión purga borradores, cola y cachés de la aplicación. Sin red, la revocación se registra como pendiente y se realiza al volver a abrir la aplicación con conexión. Hasta entonces el servidor no puede recibir la solicitud de revocación; la interfaz informa esa limitación. No compartir la tableta hasta confirmar el cierre con red.
+- Cerrar sesión purga borradores, cola y cachés de la aplicación, y elimina preventivamente pwa_offline_db en IndexedDB mediante la rutina compartida. La persistencia activa usa localStorage (utt-local-inspections y utt-lab-outbox); si el borrado de la base está bloqueado o falla se informa limpieza incompleta. Sin red, la revocación se registra como pendiente y se realiza al volver a abrir la aplicación con conexión. Hasta entonces el servidor no puede recibir la solicitud de revocación; la interfaz informa esa limitación. No compartir la tableta hasta confirmar el cierre con red.
 - Tras recargar sin conexión se deniega el acceso privado. Una pestaña ya autenticada puede capturar sin red mientras su sesión local siga vigente. Los borradores locales no están cifrados: una tableta perdida con una sesión abierta sigue siendo un riesgo residual. Usar bloqueo del dispositivo y únicamente datos sintéticos.
 - El servidor implementa creación, consulta y aprobación. Los cambios del checklist en la página de detalle siguen siendo demostraciones en memoria y no afirman actualizar el servidor.
 - React muestra los comentarios como texto; sanitizeLiteralText se reserva para destinos HTML textuales para evitar doble escape. CSP usa un valor aleatorio por respuesta para scripts, y conserva estilos inline del diseño anterior. La excepción de evaluación dinámica solo existe en desarrollo.
-- El escáner léxico propuesto produce falsos positivos en el nombre de una dependencia heredada del lockfile. No se ha modificado el escáner ni escondido coincidencias. Este punto requiere acuerdo con el profesor antes de afirmar cumplimiento total del check literal.
-- Implementación y validación automatizada asistidas por Codex. Carlos Olaya Gutiérrez confirmó su revisión, prueba y validación manual en local de autenticación, RBAC por rol, respuesta 400, CSP con nonce por respuesta y purga offline al cerrar sesión. Esta confirmación corresponde al incremento 9e684c158709cd7e7dd711d4063ae6c15a1c3a8b, anterior a los ajustes de arranque automático y enmascaramiento visual de esta revisión. No se extiende la declaración a sus compañeros.
+- El escáner léxico propuesto produce falsos positivos en el nombre de una dependencia heredada del lockfile. La lista de artefactos del comprobador público se actualizó a Semana 09; su expresión de búsqueda no se alteró. El escaneo solicitado excluye el lockfile y el propio comprobador; esa excepción no demuestra ausencia de coincidencias en el lockfile. Este punto requiere acuerdo con el profesor antes de afirmar cumplimiento total del check literal.
+- Implementación y validación automatizada asistidas por Codex. Carlos comunica la confirmación de revisión y validación humana conjunta de Carlos Olaya Gutiérrez, Montalvo Osorio Alexis y Pacheco Avila Carlos Alberto sobre la entrega integrada. La ejecución automatizada de esta consolidación se distingue de esa declaración humana.
 
----
+El [contraste con las diapositivas y la rúbrica](docs/rubric-w09.md) relaciona controles, pruebas y límites de la entrega.
+
+## Resultados y evidencia
+
+La verificación consolidada ejecuta TypeScript, build de producción y 20/20 suites PASS. tests/security.spec.ts registra 17/17 verificaciones, incluidos rechazos explícitos de cámara y ubicación y creación del supervisor fuera de alcance. Los reportes se generan en test-results/results.json y test-results/verification.json; indican SHA y si el árbol tenía modificaciones. npm run verify es el equivalente documentado de make verify.
+
+El workflow .github/workflows/week-09-w09-security-privacy.yml forma parte de la entrega. Los resultados anteriores de Actions no se atribuyen automáticamente a un SHA nuevo: la comprobación aquí reportada es local; la ejecución remota se consulta en Actions para el commit publicado. Los checks privados y la defensa corresponden al profesor.
+
+La regla RBAC mantiene al inspector limitado a reportes propios, sin aprobación; el supervisor crea reportes propios solo dentro de laboratorios asignados y consulta, actualiza o aprueba dentro de ese alcance. El visitante no realiza operaciones protegidas.
+
+## Historial de Semana 08
 
 # PWA de inspecciones — entrega Semana 08
 
@@ -107,37 +124,3 @@ Se conserva completo el [README de semanas anteriores](docs/history/readme-seman
 
 
 ---
-
-## Semana 09 — Seguridad y privacidad
-
-### Pruebas implementadas
-
-Se incorporó `tests/security.spec.ts` para comprobar el control de acceso por roles (RBAC), la validación de entradas, la limpieza de datos privados al cerrar sesión, la protección frente a contenido HTML y las restricciones de Content Security Policy (CSP).
-
-La suite contiene 14 verificaciones con datos sintéticos y sin dependencias de servicios externos.
-
-### Ejecución de pruebas
-
-```sh
-npx tsx tests/security.spec.ts
-npm test
-npm run typecheck
-npm run verify
-```
-
-### Resultados
-
-- 14/14 verificaciones de seguridad aprobadas.
-- 20/20 suites generales aprobadas.
-- TypeScript sin errores.
-- Compilación de producción y verificación general satisfactorias.
-
-### Integración continua
-
-Se incorporó el workflow oficial `.github/workflows/week-09-w09-security-privacy.yml`, que verifica instalación, compilación, existencia de entregables y ejecución de pruebas.
-
-### Limitaciones
-
-Las pruebas de contingencia verifican el comportamiento cuando no están disponibles las capacidades de cámara y ubicación. La simulación explícita de permisos denegados todavía está pendiente.
-
-La ejecución local no sustituye la evaluación del workflow en GitHub Actions.

@@ -8,6 +8,7 @@ export interface PrivateCaches {
   delete(key: string): Promise<boolean>;
 }
 export interface CleanupOptions {
+  indexedDB?: Pick<IDBFactory, "deleteDatabase">;
   storage?: PrivateStorage;
   sessionStorage?: PrivateStorage;
   cacheStorage?: PrivateCaches;
@@ -59,6 +60,32 @@ export async function clearPrivateSessionStorage(
         }
     } catch {
       failures.push("caché");
+    }
+  }
+  if (options.indexedDB) {
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const request = options.indexedDB!.deleteDatabase("pwa_offline_db");
+        const timer = setTimeout(
+          () => reject(new Error("Tiempo de borrado agotado")),
+          5000,
+        );
+        request.onsuccess = () => {
+          clearTimeout(timer);
+          resolve();
+        };
+        request.onerror = () => {
+          clearTimeout(timer);
+          reject(new Error("Borrado fallido"));
+        };
+        request.onblocked = () => {
+          clearTimeout(timer);
+          reject(new Error("Base abierta en otra pestaña"));
+        };
+      });
+      removed++;
+    } catch {
+      failures.push("IndexedDB");
     }
   }
   if (failures.length)

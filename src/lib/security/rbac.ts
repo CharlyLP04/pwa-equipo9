@@ -43,7 +43,10 @@ export function authorizeAction(
     Array.isArray(context.assignedLaboratories) &&
     context.assignedLaboratories.includes(resource.laboratoryTag);
   if (action === "approve") return scoped ? { status: 200 } : denied;
-  if (action === "create") return own ? { status: 200 } : denied;
+  if (action === "create")
+    return own && (context.role !== "supervisor" || scoped)
+      ? { status: 200 }
+      : denied;
   return (context.role === "inspector" ? own : scoped)
     ? { status: 200 }
     : denied;
