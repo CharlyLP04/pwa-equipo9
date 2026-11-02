@@ -25,6 +25,10 @@ assert.match(sw, /synthetic-runtime-fallback/);
 // Se evalúa el Service Worker con APIs simuladas.
 const handlers = new Map<string, Function>();
 
+const privateFixture = 'SYNTHETIC_PRIVATE_REPORT';
+let cacheReads = 0;
+let cacheWrites = 0;
+let online = false;
 const context = {
   self: {
     addEventListener(name: string, handler: Function) {
@@ -32,11 +36,15 @@ const context = {
     }
   },
   caches: {
+    async open() { return { async put() { cacheWrites++; } }; },
     async match() {
-      return undefined;
+      cacheReads++;
+      return new Response(privateFixture);
     }
   },
-  fetch: async () => {
+  fetch: async (_request: unknown, options?: RequestInit) => {
+    assert.equal(options?.cache, 'no-store');
+    if (online) return new Response(privateFixture);
     throw new Error("Red desconectada");
   },
   Response,
@@ -77,7 +85,24 @@ async function verificarRespuestaOffline() {
   assert.equal(response.status, 200);
   assert.match(html, /Modo Desconectado/);
 
-  console.log("offline.spec.ts: PASS");
+  assert.equal(html.includes(privateFixture), false);
+  assert.equal(cacheReads, 0, 'No recuperar reportes privados de cachés anteriores');
+  assert.equal(response.headers.get('Cache-Control'), 'no-store');
+  for (const path of ['/inspecciones/fixture', '/api/secure-inspections']) {
+    for (const connected of [true, false]) {
+      online = connected;
+      let result: Promise<Response> | undefined;
+      fetchHandler!({request:{...request,url:'https://example.com'+path,mode:path.startsWith('/api/')?'cors':'navigate'},respondWith(value:Promise<Response>){result=value;}});
+      assert.ok(result);
+      const response = await result;
+      const content = await response.text();
+      if (connected) assert.equal(content, privateFixture);
+      else { assert.equal(content.includes(privateFixture),false); assert.equal(response.status,path.startsWith('/api/')?503:200); }
+    }
+  }
+  assert.equal(cacheReads, 0);
+  assert.equal(cacheWrites, 0, 'No persistir respuestas privadas al recuperar la red');
+  console.log("offline.spec.ts: PASS (caché privada previa, navegación y API offline)");
 }
 
 verificarRespuestaOffline().catch((error) => {

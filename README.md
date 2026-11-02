@@ -50,6 +50,8 @@ El campo de frase de acceso usa enmascaramiento visual CSS para cumplir el escá
 - El escáner léxico propuesto produce falsos positivos en el nombre de una dependencia heredada del lockfile. La lista de artefactos del comprobador público se actualizó a Semana 09; su expresión de búsqueda no se alteró. El escaneo solicitado excluye el lockfile y el propio comprobador; esa excepción no demuestra ausencia de coincidencias en el lockfile. Este punto requiere acuerdo con el profesor antes de afirmar cumplimiento total del check literal.
 - Implementación y validación automatizada asistidas por Codex. Carlos comunica la confirmación de revisión y validación humana conjunta de Carlos Olaya Gutiérrez, Montalvo Osorio Alexis y Pacheco Avila Carlos Alberto sobre la entrega integrada. La ejecución automatizada de esta consolidación se distingue de esa declaración humana.
 
+El [contraste con las diapositivas y la rúbrica](docs/rubric-w09.md) relaciona controles, pruebas y límites de la entrega.
+
 ## Resultados y evidencia
 
 La verificación consolidada ejecuta TypeScript, build de producción y 20/20 suites PASS. tests/security.spec.ts registra 17/17 verificaciones, incluidos rechazos explícitos de cámara y ubicación y creación del supervisor fuera de alcance. Los reportes se generan en test-results/results.json y test-results/verification.json; indican SHA y si el árbol tenía modificaciones. npm run verify es el equivalente documentado de make verify.
